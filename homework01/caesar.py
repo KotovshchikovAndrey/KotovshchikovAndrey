@@ -1,46 +1,46 @@
 import typing as tp
 
+from string import ascii_lowercase, ascii_uppercase
+
 
 def encrypt_caesar(plaintext: str, shift: int = 3) -> str:
-    """
-    Encrypts plaintext using a Caesar cipher.
-
-    >>> encrypt_caesar("PYTHON")
-    'SBWKRQ'
-    >>> encrypt_caesar("python")
-    'sbwkrq'
-    >>> encrypt_caesar("Python3.6")
-    'Sbwkrq3.6'
-    >>> encrypt_caesar("")
-    ''
-    """
     ciphertext = ""
-    # PUT YOUR CODE HERE
+    for symbol in plaintext:
+        alphabet = ascii_uppercase if symbol.isupper() else ascii_lowercase 
+        symbol_index_in_ascii = alphabet.find(symbol) 
+        if symbol_index_in_ascii == -1:
+            ciphertext += symbol
+            continue
+        
+        try:
+            ciphertext += alphabet[symbol_index_in_ascii + shift]
+        except IndexError:
+            last_symbol_shift = (symbol_index_in_ascii + shift) - len(alphabet)
+            ciphertext += alphabet[last_symbol_shift]
+
     return ciphertext
 
 
 def decrypt_caesar(ciphertext: str, shift: int = 3) -> str:
-    """
-    Decrypts a ciphertext using a Caesar cipher.
-
-    >>> decrypt_caesar("SBWKRQ")
-    'PYTHON'
-    >>> decrypt_caesar("sbwkrq")
-    'python'
-    >>> decrypt_caesar("Sbwkrq3.6")
-    'Python3.6'
-    >>> decrypt_caesar("")
-    ''
-    """
     plaintext = ""
-    # PUT YOUR CODE HERE
+    for symbol in ciphertext:
+        alphabet = ascii_uppercase if symbol.isupper() else ascii_lowercase 
+        symbol_index_in_ascii = alphabet.find(symbol) 
+        if symbol_index_in_ascii == -1:
+            plaintext += symbol
+            continue
+        
+        plaintext += alphabet[symbol_index_in_ascii - shift]
+
     return plaintext
 
 
 def caesar_breaker_brute_force(ciphertext: str, dictionary: tp.Set[str]) -> int:
-    """
-    Brute force breaking a Caesar cipher.
-    """
     best_shift = 0
-    # PUT YOUR CODE HERE
-    return best_shift
+    while True:
+        plaintext = decrypt_caesar(ciphertext=ciphertext, shift=best_shift)
+        if plaintext not in dictionary:
+            best_shift += 1
+            continue
+
+        return best_shift
