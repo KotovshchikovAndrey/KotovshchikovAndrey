@@ -18,7 +18,7 @@ def encrypt_vigenere(plaintext: str, keyword: str) -> str:
         try:
             ciphertext += alphabet[symbol_index_in_ascii + shift]
         except IndexError:
-            ciphertext += alphabet[(symbol_index_in_ascii + shift) % len(alphabet)]
+            ciphertext += alphabet[( symbol_index_in_ascii + shift ) % len(alphabet)]
 
     return ciphertext
 

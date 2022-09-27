@@ -15,7 +15,7 @@ def encrypt_caesar(plaintext: str, shift: int = 3) -> str:
         try:
             ciphertext += alphabet[symbol_index_in_ascii + shift]
         except IndexError:
-            ciphertext += alphabet[(symbol_index_in_ascii + shift) % len(alphabet)]
+            ciphertext += alphabet[( symbol_index_in_ascii + shift ) % len(alphabet)]
 
     return ciphertext
 
