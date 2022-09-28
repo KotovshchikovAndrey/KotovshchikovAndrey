@@ -5,22 +5,19 @@ import typing as tp
 def is_prime(n: int) -> bool:
     for d in range(2, n):
         if n % d == 0:
-            break
-    else:
-        if n != 1: 
-            return True
+            return False
     
-    return False
+    return True if n != 1 else False
 
 
 def gcd(a: int, b: int) -> int:
-    if all(( a == 0, b == 0 )):
+    if all((a == 0, b == 0)):
         return 0
-    elif any(( a == 0, b == 0)):
+    elif any((a == 0, b == 0)):
         return max(a, b)
 
     divisible, divider = max(a, b), min(a, b)
-    while ( divisible % divider ) != 0:
+    while (divisible % divider) != 0:
         divisible, divider = divider, divisible % divider
     
     return divider
@@ -30,13 +27,13 @@ def multiplicative_inverse(e: int, phi: int) -> int:
     divisible, divider = max(e, phi), min(e, phi)
 
     intermediate_division_values = [divisible // divider]
-    while ( divisible % divider ) != 0:
+    while (divisible % divider) != 0:
         divisible, divider = divider, divisible % divider
         intermediate_division_values.append(divisible // divider)
     
     x, y = 0, 1
     for i in range(1, len(intermediate_division_values))[::-1]:
-        x, y = y, x - y*(intermediate_division_values[i - 1])
+        x, y = y, x - y * (intermediate_division_values[i - 1])
     
     return y % phi
 
@@ -47,8 +44,8 @@ def generate_keypair(p: int, q: int) -> tp.Tuple[tp.Tuple[int, int], tp.Tuple[in
     elif p == q:
         raise ValueError("p and q cannot be equal")
 
-    n = p*q
-    phi = (p-1)*(q-1)
+    n = p * q
+    phi = (p - 1) * (q - 1)
 
     # Choose an integer e such that e and phi(n) are coprime
     e = random.randrange(1, phi)
@@ -81,7 +78,7 @@ def decrypt(pk: tp.Tuple[int, int], ciphertext: tp.List[int]) -> str:
     # Unpack the key into its components
     key, n = pk
     # Generate the plaintext based on the ciphertext and key using a^b mod m
-    plain = [chr((char ** key) % n) for char in ciphertext]
+    plain = [chr((char**key) % n) for char in ciphertext]
     # Return the array of bytes as a string
     return "".join(plain)
 

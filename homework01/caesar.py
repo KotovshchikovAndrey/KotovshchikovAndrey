@@ -5,8 +5,8 @@ from string import ascii_lowercase, ascii_uppercase
 def encrypt_caesar(plaintext: str, shift: int = 3) -> str:
     ciphertext = ""
     for symbol in plaintext:
-        alphabet = ascii_uppercase if symbol.isupper() else ascii_lowercase 
-        symbol_index_in_ascii = alphabet.find(symbol) 
+        alphabet = ascii_uppercase if symbol.isupper() else ascii_lowercase
+        symbol_index_in_ascii = alphabet.find(symbol)
         if symbol_index_in_ascii == -1:
             ciphertext += symbol
             continue
@@ -14,7 +14,7 @@ def encrypt_caesar(plaintext: str, shift: int = 3) -> str:
         try:
             ciphertext += alphabet[symbol_index_in_ascii + shift]
         except IndexError:
-            ciphertext += alphabet[( symbol_index_in_ascii + shift ) % len(alphabet)]
+            ciphertext += alphabet[(symbol_index_in_ascii + shift) % len(alphabet)]
 
     return ciphertext
 
@@ -22,8 +22,8 @@ def encrypt_caesar(plaintext: str, shift: int = 3) -> str:
 def decrypt_caesar(ciphertext: str, shift: int = 3) -> str:
     plaintext = ""
     for symbol in ciphertext:
-        alphabet = ascii_uppercase if symbol.isupper() else ascii_lowercase 
-        symbol_index_in_ascii = alphabet.find(symbol) 
+        alphabet = ascii_uppercase if symbol.isupper() else ascii_lowercase
+        symbol_index_in_ascii = alphabet.find(symbol)
         if symbol_index_in_ascii == -1:
             plaintext += symbol
             continue
