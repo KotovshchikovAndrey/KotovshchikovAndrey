@@ -6,7 +6,7 @@ def is_prime(n: int) -> bool:
     for d in range(2, n):
         if n % d == 0:
             return False
-    
+
     return True if n != 1 else False
 
 
@@ -19,7 +19,7 @@ def gcd(a: int, b: int) -> int:
     divisible, divider = max(a, b), min(a, b)
     while (divisible % divider) != 0:
         divisible, divider = divider, divisible % divider
-    
+
     return divider
     
 
@@ -30,11 +30,11 @@ def multiplicative_inverse(e: int, phi: int) -> int:
     while (divisible % divider) != 0:
         divisible, divider = divider, divisible % divider
         intermediate_division_values.append(divisible // divider)
-    
+
     x, y = 0, 1
     for i in range(1, len(intermediate_division_values))[::-1]:
         x, y = y, x - y * (intermediate_division_values[i - 1])
-    
+
     return y % phi
 
 

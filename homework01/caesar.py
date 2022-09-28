@@ -10,7 +10,7 @@ def encrypt_caesar(plaintext: str, shift: int = 3) -> str:
         if symbol_index_in_ascii == -1:
             ciphertext += symbol
             continue
-        
+
         try:
             ciphertext += alphabet[symbol_index_in_ascii + shift]
         except IndexError:
@@ -27,7 +27,7 @@ def decrypt_caesar(ciphertext: str, shift: int = 3) -> str:
         if symbol_index_in_ascii == -1:
             plaintext += symbol
             continue
-        
+
         plaintext += alphabet[symbol_index_in_ascii - shift]
 
     return plaintext
