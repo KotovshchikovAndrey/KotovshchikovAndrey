@@ -21,7 +21,7 @@ def gcd(a: int, b: int) -> int:
         divisible, divider = divider, divisible % divider
 
     return divider
-    
+
 
 def multiplicative_inverse(e: int, phi: int) -> int:
     divisible, divider = max(e, phi), min(e, phi)
