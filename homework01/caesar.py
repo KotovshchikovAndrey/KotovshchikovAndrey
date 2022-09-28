@@ -1,5 +1,4 @@
 import typing as tp
-
 from string import ascii_lowercase, ascii_uppercase
 
 
