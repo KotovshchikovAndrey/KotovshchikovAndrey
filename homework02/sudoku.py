@@ -1,6 +1,12 @@
 import pathlib
 import typing as tp
 
+# размер игрового
+FIELD_SIZE = (9, 9)
+
+# размер маленького квадрата
+SQUARE_SIZE = (3, 3)
+
 T = tp.TypeVar("T")
 
 
@@ -34,55 +40,47 @@ def display(grid: tp.List[tp.List[str]]) -> None:
 
 
 def group(values: tp.List[T], n: int) -> tp.List[tp.List[T]]:
-    """
-    Сгруппировать значения values в список, состоящий из списков по n элементов
+    group_matrix = []
+    for i in range(0, len(values), n):
+        group_matrix.append(values[i:i+n])
 
-    >>> group([1,2,3,4], 2)
-    [[1, 2], [3, 4]]
-    >>> group([1,2,3,4,5,6,7,8,9], 3)
-    [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
-    """
-    pass
+    return group_matrix
 
 
 def get_row(grid: tp.List[tp.List[str]], pos: tp.Tuple[int, int]) -> tp.List[str]:
-    """Возвращает все значения для номера строки, указанной в pos
-
-    >>> get_row([['1', '2', '.'], ['4', '5', '6'], ['7', '8', '9']], (0, 0))
-    ['1', '2', '.']
-    >>> get_row([['1', '2', '3'], ['4', '.', '6'], ['7', '8', '9']], (1, 0))
-    ['4', '.', '6']
-    >>> get_row([['1', '2', '3'], ['4', '5', '6'], ['.', '8', '9']], (2, 0))
-    ['.', '8', '9']
-    """
-    pass
+    return grid[pos[0]]
 
 
 def get_col(grid: tp.List[tp.List[str]], pos: tp.Tuple[int, int]) -> tp.List[str]:
-    """Возвращает все значения для номера столбца, указанного в pos
+    col = []
+    for row in grid:
+        col.append(row[pos[1]])
 
-    >>> get_col([['1', '2', '.'], ['4', '5', '6'], ['7', '8', '9']], (0, 0))
-    ['1', '4', '7']
-    >>> get_col([['1', '2', '3'], ['4', '.', '6'], ['7', '8', '9']], (0, 1))
-    ['2', '.', '8']
-    >>> get_col([['1', '2', '3'], ['4', '5', '6'], ['.', '8', '9']], (0, 2))
-    ['3', '6', '9']
-    """
-    pass
+    return col
 
 
 def get_block(grid: tp.List[tp.List[str]], pos: tp.Tuple[int, int]) -> tp.List[str]:
-    """Возвращает все значения из квадрата, в который попадает позиция pos
+    sector_position = (
+        pos[0] // SQUARE_SIZE[0],
+        pos[1] // SQUARE_SIZE[1]
+    )
+    # индекс строки, где начинается сектор
+    sectror_row_start_position = sector_position[0] * SQUARE_SIZE[0]
 
-    >>> grid = read_sudoku('puzzle1.txt')
-    >>> get_block(grid, (0, 1))
-    ['5', '3', '.', '6', '.', '.', '.', '9', '8']
-    >>> get_block(grid, (4, 7))
-    ['.', '.', '3', '.', '.', '1', '.', '.', '6']
-    >>> get_block(grid, (8, 8))
-    ['2', '8', '.', '.', '.', '5', '.', '7', '9']
-    """
-    pass
+    # индекс строки, где заканчивается сектор (не включительно)
+    sectror_row_end_position = sectror_row_start_position + SQUARE_SIZE[0]
+
+    # индекс колонки, где начинается сектор
+    sector_col_start_position = sector_position[1] * SQUARE_SIZE[1]
+
+    # индекс колонки, где заканчивается сектор (не включительно)
+    sector_col_end_position = sector_col_start_position + SQUARE_SIZE[1]
+
+    square_elements_list = []
+    for row in grid[sectror_row_start_position:sectror_row_end_position]:
+        square_elements_list.extend(row[sector_col_start_position:sector_col_end_position])
+    
+    return square_elements_list
 
 
 def find_empty_positions(grid: tp.List[tp.List[str]]) -> tp.Optional[tp.Tuple[int, int]]:
