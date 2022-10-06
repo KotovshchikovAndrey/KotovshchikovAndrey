@@ -123,7 +123,6 @@ def solve(grid: tp.List[tp.List[str]]) -> tp.Optional[tp.List[tp.List[str]]]:
     def search(local_grid: tp.List[tp.List[str]]) -> None:
         """ Рекурсивная функция для поиска решения """
         nonlocal solving_grid
-
         empty_positions = find_empty_positions(local_grid)
 
         # (блок if)
@@ -153,8 +152,28 @@ def solve(grid: tp.List[tp.List[str]]) -> tp.Optional[tp.List[tp.List[str]]]:
 
 def check_solution(solution: tp.List[tp.List[str]]) -> bool:
     """ Если решение solution верно, то вернуть True, в противном случае False """
-    # TODO: Add doctests with bad puzzles
-    pass
+    for row_index in range(FIELD_SIZE[0]):
+        for col_index in range(FIELD_SIZE[1]):
+            row_values_list = get_row(solution, (row_index, col_index))
+            col_values_list = get_col(solution, (row_index, col_index))
+            sector_values_list = get_block(solution, (row_index, col_index))
+
+            # объединенное множество
+            union_set = set(row_values_list) | set(col_values_list) | set(sector_values_list)
+
+            # кортех условий, при которых решение верно
+            is_solution_tuple = (
+                len(row_values_list) == len(set(row_values_list)), 
+                len(col_values_list) == len(set(col_values_list)),
+                len(sector_values_list) == len(set(sector_values_list)),
+                not(union_set - UNIVERSAL_SET)
+            )
+            
+            # если хоть 1 итерация не верна, то все решение не верно
+            if not all(is_solution_tuple):
+                return False
+    
+    return True
 
 
 def generate_sudoku(N: int) -> tp.List[tp.List[str]]:
