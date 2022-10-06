@@ -1,5 +1,6 @@
 import pathlib
 import typing as tp
+import random
 
 # размер игрового
 FIELD_SIZE = (9, 9)
@@ -7,8 +8,12 @@ FIELD_SIZE = (9, 9)
 # размер маленького квадрата
 SQUARE_SIZE = (3, 3)
 
+# Максимальное и Минимальное значение в судоку
+MIN_VALUE = 1
+MAX_VALUE = 9
+
 # множество из всех возможных элементов (цифр)
-UNIVERSAL_SET = {str(num) for num in range(1, 10)}
+UNIVERSAL_SET = {str(num) for num in range(MIN_VALUE, MAX_VALUE + 1)}
 
 T = tp.TypeVar("T")
 
@@ -107,7 +112,7 @@ def find_possible_values(grid: tp.List[tp.List[str]], pos: tp.Tuple[int, int]) -
     free_values_in_sectror = UNIVERSAL_SET - sector_values
     posible_values_set = set()
     for free_element in free_values_in_sectror:
-        if any([free_element in row, free_element in col]):
+        if any((free_element in row, free_element in col)):
             continue
 
         posible_values_set.add(free_element)
@@ -118,36 +123,27 @@ def find_possible_values(grid: tp.List[tp.List[str]], pos: tp.Tuple[int, int]) -
 def solve(grid: tp.List[tp.List[str]]) -> tp.Optional[tp.List[tp.List[str]]]:
     """ Решение пазла, заданного в grid """
 
-    # перемнная, в которое помещается решение судоку (по умолчанию None)
-    solving_grid = None
-    def search(local_grid: tp.List[tp.List[str]]) -> None:
+    def _get_solution(local_grid: tp.List[tp.List[str]]) -> tp.Optional[tp.List[tp.List[str]]]:
         """ Рекурсивная функция для поиска решения """
-        nonlocal solving_grid
         empty_positions = find_empty_positions(local_grid)
+        if empty_positions is None:
+            return local_grid
+        
+        possible_values_set = find_possible_values(local_grid, empty_positions)
 
-        # (блок if)
-        # проверяем, остались ли еще незаполненные поля
-        #
-        # (блок else)
-        # если пустых полей нет, значит мы нашли решение
-        # в переменную solving_grid присваиваем новый объект list
-        if empty_positions is not None:
-            possible_values_set = find_possible_values(local_grid, empty_positions)
+        # если нет вариантов для решения, то дальше не идем
+        if not possible_values_set:
+            return
+        
+        row_empty_position, col_empty_position = empty_positions
+        for values in possible_values_set:
+            local_grid[row_empty_position][col_empty_position] = values
+            if _get_solution(local_grid) is not None:
+                return local_grid
 
-            # если нет вариантов для решения, то дальше не идем
-            if not possible_values_set:
-                 return
-            
-            row_empty_position, col_empty_position = empty_positions
-            for values in possible_values_set:
-                local_grid[row_empty_position][col_empty_position] = values
-                search(local_grid)
-                local_grid[row_empty_position][col_empty_position] = '.'
-        else:
-            solving_grid = solving_grid = [row.copy() for row in local_grid]
+            local_grid[row_empty_position][col_empty_position] = '.'
 
-    search(grid.copy())
-    return solving_grid
+    return _get_solution(grid.copy())
 
 
 def check_solution(solution: tp.List[tp.List[str]]) -> bool:
@@ -177,28 +173,28 @@ def check_solution(solution: tp.List[tp.List[str]]) -> bool:
 
 
 def generate_sudoku(N: int) -> tp.List[tp.List[str]]:
-    """Генерация судоку заполненного на N элементов
+    """ Генерация судоку заполненного на N элементов """
+    empty_sudoku = [['.' for _ in range(FIELD_SIZE[1])] for _ in range(FIELD_SIZE[0])]
+    if N == 0:
+        return empty_sudoku
 
-    >>> grid = generate_sudoku(40)
-    >>> sum(1 for row in grid for e in row if e == '.')
-    41
-    >>> solution = solve(grid)
-    >>> check_solution(solution)
-    True
-    >>> grid = generate_sudoku(1000)
-    >>> sum(1 for row in grid for e in row if e == '.')
-    0
-    >>> solution = solve(grid)
-    >>> check_solution(solution)
-    True
-    >>> grid = generate_sudoku(0)
-    >>> sum(1 for row in grid for e in row if e == '.')
-    81
-    >>> solution = solve(grid)
-    >>> check_solution(solution)
-    True
-    """
-    pass
+    sudoku = solve(grid=empty_sudoku)
+    field_square_size = FIELD_SIZE[0] * FIELD_SIZE[1]
+    if N > field_square_size:
+        return sudoku
+
+    free_position_count = field_square_size - N 
+    while free_position_count != 0:
+        row_index_position, col_index_position = \
+            (random.randint(0, FIELD_SIZE[0] - 1), random.randint(0, FIELD_SIZE[1] - 1))
+        
+        if sudoku[row_index_position][col_index_position] == '.':
+            continue
+
+        sudoku[row_index_position][col_index_position] = '.'
+        free_position_count -= 1
+    
+    return sudoku
 
 
 if __name__ == "__main__":
