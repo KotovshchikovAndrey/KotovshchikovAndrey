@@ -1,6 +1,7 @@
 import pathlib
 import typing as tp
 import random
+import time
 
 # размер игрового
 FIELD_SIZE = (9, 9)
@@ -19,7 +20,7 @@ T = tp.TypeVar("T")
 
 
 def read_sudoku(path: tp.Union[str, pathlib.Path]) -> tp.List[tp.List[str]]:
-    """ Прочитать Судоку из указанного файла """
+    """Прочитать Судоку из указанного файла"""
     path = pathlib.Path(path)
     with path.open() as f:
         puzzle = f.read()
@@ -33,13 +34,14 @@ def create_grid(puzzle: str) -> tp.List[tp.List[str]]:
 
 
 def display(grid: tp.List[tp.List[str]]) -> None:
-    """ Вывод Судоку """
+    """Вывод Судоку"""
     width = 2
     line = "+".join(["-" * (width * 3)] * 3)
     for row in range(9):
         print(
             "".join(
-                grid[row][col].center(width) + ("|" if str(col) in "25" else "") for col in range(9)
+                grid[row][col].center(width) + ("|" if str(col) in "25" else "")
+                for col in range(9)
             )
         )
         if str(row) in "25":
@@ -48,21 +50,21 @@ def display(grid: tp.List[tp.List[str]]) -> None:
 
 
 def group(values: tp.List[T], n: int) -> tp.List[tp.List[T]]:
-    """ Сгруппировать значения values в список, состоящий из списков по n элементов """
+    """Сгруппировать значения values в список, состоящий из списков по n элементов"""
     group_matrix = []
     for i in range(0, len(values), n):
-        group_matrix.append(values[i:i+n])
+        group_matrix.append(values[i : i + n])
 
     return group_matrix
 
 
 def get_row(grid: tp.List[tp.List[str]], pos: tp.Tuple[int, int]) -> tp.List[str]:
-    """ Возвращает все значения для номера строки, указанной в pos """
+    """Возвращает все значения для номера строки, указанной в pos"""
     return grid[pos[0]]
 
 
 def get_col(grid: tp.List[tp.List[str]], pos: tp.Tuple[int, int]) -> tp.List[str]:
-    """ Возвращает все значения для номера столбца, указанного в pos """
+    """Возвращает все значения для номера столбца, указанного в pos"""
     col = []
     for row in grid:
         col.append(row[pos[1]])
@@ -71,11 +73,8 @@ def get_col(grid: tp.List[tp.List[str]], pos: tp.Tuple[int, int]) -> tp.List[str
 
 
 def get_block(grid: tp.List[tp.List[str]], pos: tp.Tuple[int, int]) -> tp.List[str]:
-    """Возвращает все значения из квадрата, в который попадает позиция pos """
-    sector_position = (
-        pos[0] // SQUARE_SIZE[0],
-        pos[1] // SQUARE_SIZE[1]
-    )
+    """Возвращает все значения из квадрата, в который попадает позиция pos"""
+    sector_position = (pos[0] // SQUARE_SIZE[0], pos[1] // SQUARE_SIZE[1])
     # индекс строки, где начинается сектор
     sectror_row_start_position = sector_position[0] * SQUARE_SIZE[0]
 
@@ -90,22 +89,28 @@ def get_block(grid: tp.List[tp.List[str]], pos: tp.Tuple[int, int]) -> tp.List[s
 
     square_elements_list = []
     for row in grid[sectror_row_start_position:sectror_row_end_position]:
-        square_elements_list.extend(row[sector_col_start_position:sector_col_end_position])
-    
+        square_elements_list.extend(
+            row[sector_col_start_position:sector_col_end_position]
+        )
+
     return square_elements_list
 
 
-def find_empty_positions(grid: tp.List[tp.List[str]]) -> tp.Optional[tp.Tuple[int, int]]:
-    """ Найти первую свободную позицию в пазле """
+def find_empty_positions(
+    grid: tp.List[tp.List[str]],
+) -> tp.Optional[tp.Tuple[int, int]]:
+    """Найти первую свободную позицию в пазле"""
     for row_index, row in enumerate(grid):
-        if '.' in row:
-            return row_index, row.index('.')
-    
+        if "." in row:
+            return row_index, row.index(".")
+
     return None
 
 
-def find_possible_values(grid: tp.List[tp.List[str]], pos: tp.Tuple[int, int]) -> tp.Set[str]:
-    """ Вернуть множество возможных значения для указанной позиции """
+def find_possible_values(
+    grid: tp.List[tp.List[str]], pos: tp.Tuple[int, int]
+) -> tp.Set[str]:
+    """Вернуть множество возможных значения для указанной позиции"""
     row, col = get_row(grid, pos), get_col(grid, pos)
     sector_values = set(get_block(grid, pos))
 
@@ -116,38 +121,42 @@ def find_possible_values(grid: tp.List[tp.List[str]], pos: tp.Tuple[int, int]) -
             continue
 
         posible_values_set.add(free_element)
-    
+
     return posible_values_set
 
 
 def solve(grid: tp.List[tp.List[str]]) -> tp.Optional[tp.List[tp.List[str]]]:
-    """ Решение пазла, заданного в grid """
+    """Решение пазла, заданного в grid"""
 
-    def _get_solution(local_grid: tp.List[tp.List[str]]) -> tp.Optional[tp.List[tp.List[str]]]:
-        """ Рекурсивная функция для поиска решения """
+    def _get_solution(
+        local_grid: tp.List[tp.List[str]],
+    ) -> tp.Optional[tp.List[tp.List[str]]]:
+        """Рекурсивная функция для поиска решения"""
         empty_positions = find_empty_positions(local_grid)
         if empty_positions is None:
             return local_grid
-        
+
         possible_values_set = find_possible_values(local_grid, empty_positions)
 
         # если нет вариантов для решения, то дальше не идем
         if not possible_values_set:
-            return
-        
+            return None
+
         row_empty_position, col_empty_position = empty_positions
         for values in possible_values_set:
             local_grid[row_empty_position][col_empty_position] = values
             if _get_solution(local_grid) is not None:
                 return local_grid
 
-            local_grid[row_empty_position][col_empty_position] = '.'
+            local_grid[row_empty_position][col_empty_position] = "."
+
+        return None
 
     return _get_solution(grid.copy())
 
 
 def check_solution(solution: tp.List[tp.List[str]]) -> bool:
-    """ Если решение solution верно, то вернуть True, в противном случае False """
+    """Если решение solution верно, то вернуть True, в противном случае False"""
     for row_index in range(FIELD_SIZE[0]):
         for col_index in range(FIELD_SIZE[1]):
             row_values_list = get_row(solution, (row_index, col_index))
@@ -155,54 +164,81 @@ def check_solution(solution: tp.List[tp.List[str]]) -> bool:
             sector_values_list = get_block(solution, (row_index, col_index))
 
             # объединенное множество
-            union_set = set(row_values_list) | set(col_values_list) | set(sector_values_list)
+            union_set = (
+                set(row_values_list) | set(col_values_list) | set(sector_values_list)
+            )
 
             # кортех условий, при которых решение верно
             is_solution_tuple = (
-                len(row_values_list) == len(set(row_values_list)), 
+                len(row_values_list) == len(set(row_values_list)),
                 len(col_values_list) == len(set(col_values_list)),
                 len(sector_values_list) == len(set(sector_values_list)),
-                not(union_set - UNIVERSAL_SET)
+                not (union_set - UNIVERSAL_SET),
             )
-            
+
             # если хоть 1 итерация не верна, то все решение не верно
             if not all(is_solution_tuple):
                 return False
-    
+
     return True
 
 
 def generate_sudoku(N: int) -> tp.List[tp.List[str]]:
-    """ Генерация судоку заполненного на N элементов """
-    empty_sudoku = [['.' for _ in range(FIELD_SIZE[1])] for _ in range(FIELD_SIZE[0])]
+    """Генерация судоку заполненного на N элементов"""
+    empty_sudoku = [["." for _ in range(FIELD_SIZE[1])] for _ in range(FIELD_SIZE[0])]
     if N == 0:
         return empty_sudoku
 
     sudoku = solve(grid=empty_sudoku)
+    # Для mypy
+    if sudoku is None:
+        return empty_sudoku
+
     field_square_size = FIELD_SIZE[0] * FIELD_SIZE[1]
     if N > field_square_size:
         return sudoku
 
-    free_position_count = field_square_size - N 
+    free_position_count = field_square_size - N
     while free_position_count != 0:
-        row_index_position, col_index_position = \
-            (random.randint(0, FIELD_SIZE[0] - 1), random.randint(0, FIELD_SIZE[1] - 1))
-        
-        if sudoku[row_index_position][col_index_position] == '.':
+        row_index_position, col_index_position = (
+            random.randint(0, FIELD_SIZE[0] - 1),
+            random.randint(0, FIELD_SIZE[1] - 1),
+        )
+
+        if sudoku[row_index_position][col_index_position] == ".":
             continue
 
-        sudoku[row_index_position][col_index_position] = '.'
+        sudoku[row_index_position][col_index_position] = "."
         free_position_count -= 1
-    
+
     return sudoku
 
 
+def _hard_puzzles_generator(values: str, n: int) -> tp.Generator:
+    for i in range(0, len(values) // n**2, n**2):
+        group_puzzle = group(list(values[i : i + n**2]), n)
+        yield group_puzzle
+
+
+def run_solve(puzzle: tp.List[tp.List[str]]) -> None:
+    start = time.time()
+    solution = solve(puzzle)
+    end = time.time()
+    if solution is not None:
+        print(f"{end-start}")
+        display(solution)
+    else:
+        print(f"Puzzle {puzzle} can't be solved")
+
+
 if __name__ == "__main__":
-    for fname in ["puzzle1.txt", "puzzle2.txt", "puzzle3.txt"]:
-        grid = read_sudoku(fname)
-        display(grid)
-        solution = solve(grid)
-        if not solution:
-            print(f"Puzzle {fname} can't be solved")
-        else:
-            display(solution)
+    import multiprocessing
+
+    path = pathlib.Path("hard_puzzles.txt")
+    with path.open() as f:
+        values = f.read()
+
+    puzzles_generator = _hard_puzzles_generator(values, 9)
+    for puzzle in puzzles_generator:
+        process = multiprocessing.Process(target=run_solve, kwargs={"puzzle": puzzle})
+        process.start()
