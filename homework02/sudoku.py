@@ -40,8 +40,7 @@ def display(grid: tp.List[tp.List[str]]) -> None:
     for row in range(9):
         print(
             "".join(
-                grid[row][col].center(width) + ("|" if str(col) in "25" else "")
-                for col in range(9)
+                grid[row][col].center(width) + ("|" if str(col) in "25" else "") for col in range(9)
             )
         )
         if str(row) in "25":
@@ -89,9 +88,7 @@ def get_block(grid: tp.List[tp.List[str]], pos: tp.Tuple[int, int]) -> tp.List[s
 
     square_elements_list = []
     for row in grid[sectror_row_start_position:sectror_row_end_position]:
-        square_elements_list.extend(
-            row[sector_col_start_position:sector_col_end_position]
-        )
+        square_elements_list.extend(row[sector_col_start_position:sector_col_end_position])
 
     return square_elements_list
 
@@ -107,9 +104,7 @@ def find_empty_positions(
     return None
 
 
-def find_possible_values(
-    grid: tp.List[tp.List[str]], pos: tp.Tuple[int, int]
-) -> tp.Set[str]:
+def find_possible_values(grid: tp.List[tp.List[str]], pos: tp.Tuple[int, int]) -> tp.Set[str]:
     """Вернуть множество возможных значения для указанной позиции"""
     row, col = get_row(grid, pos), get_col(grid, pos)
     sector_values = set(get_block(grid, pos))
@@ -164,9 +159,8 @@ def check_solution(solution: tp.List[tp.List[str]]) -> bool:
             sector_values_list = get_block(solution, (row_index, col_index))
 
             # объединенное множество
-            union_set = (
-                set(row_values_list) | set(col_values_list) | set(sector_values_list)
-            )
+            union_set = set(row_values_list) | set(col_values_list) | set(sector_values_list)
+
 
             # кортех условий, при которых решение верно
             is_solution_tuple = (
