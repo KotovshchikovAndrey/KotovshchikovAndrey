@@ -7,6 +7,9 @@ FIELD_SIZE = (9, 9)
 # размер маленького квадрата
 SQUARE_SIZE = (3, 3)
 
+# множество из всех возможных элементов (цифр)
+UNIVERSAL_SET = {str(num) for num in range(1, 10)}
+
 T = tp.TypeVar("T")
 
 
@@ -25,7 +28,7 @@ def create_grid(puzzle: str) -> tp.List[tp.List[str]]:
 
 
 def display(grid: tp.List[tp.List[str]]) -> None:
-    """Вывод Судоку """
+    """ Вывод Судоку """
     width = 2
     line = "+".join(["-" * (width * 3)] * 3)
     for row in range(9):
@@ -40,6 +43,7 @@ def display(grid: tp.List[tp.List[str]]) -> None:
 
 
 def group(values: tp.List[T], n: int) -> tp.List[tp.List[T]]:
+    """ Сгруппировать значения values в список, состоящий из списков по n элементов """
     group_matrix = []
     for i in range(0, len(values), n):
         group_matrix.append(values[i:i+n])
@@ -48,10 +52,12 @@ def group(values: tp.List[T], n: int) -> tp.List[tp.List[T]]:
 
 
 def get_row(grid: tp.List[tp.List[str]], pos: tp.Tuple[int, int]) -> tp.List[str]:
+    """ Возвращает все значения для номера строки, указанной в pos """
     return grid[pos[0]]
 
 
 def get_col(grid: tp.List[tp.List[str]], pos: tp.Tuple[int, int]) -> tp.List[str]:
+    """ Возвращает все значения для номера столбца, указанного в pos """
     col = []
     for row in grid:
         col.append(row[pos[1]])
@@ -60,6 +66,7 @@ def get_col(grid: tp.List[tp.List[str]], pos: tp.Tuple[int, int]) -> tp.List[str
 
 
 def get_block(grid: tp.List[tp.List[str]], pos: tp.Tuple[int, int]) -> tp.List[str]:
+    """Возвращает все значения из квадрата, в который попадает позиция pos """
     sector_position = (
         pos[0] // SQUARE_SIZE[0],
         pos[1] // SQUARE_SIZE[1]
@@ -84,30 +91,28 @@ def get_block(grid: tp.List[tp.List[str]], pos: tp.Tuple[int, int]) -> tp.List[s
 
 
 def find_empty_positions(grid: tp.List[tp.List[str]]) -> tp.Optional[tp.Tuple[int, int]]:
-    """Найти первую свободную позицию в пазле
-
-    >>> find_empty_positions([['1', '2', '.'], ['4', '5', '6'], ['7', '8', '9']])
-    (0, 2)
-    >>> find_empty_positions([['1', '2', '3'], ['4', '.', '6'], ['7', '8', '9']])
-    (1, 1)
-    >>> find_empty_positions([['1', '2', '3'], ['4', '5', '6'], ['.', '8', '9']])
-    (2, 0)
-    """
-    pass
+    """ Найти первую свободную позицию в пазле """
+    for row_index, row in enumerate(grid):
+        if '.' in row:
+            return row_index, row.index('.')
+    
+    return None
 
 
 def find_possible_values(grid: tp.List[tp.List[str]], pos: tp.Tuple[int, int]) -> tp.Set[str]:
-    """Вернуть множество возможных значения для указанной позиции
+    """Вернуть множество возможных значения для указанной позиции """
+    row, col = get_row(grid, pos), get_col(grid, pos)
+    sector_values = set(get_block(grid, pos))
 
-    >>> grid = read_sudoku('puzzle1.txt')
-    >>> values = find_possible_values(grid, (0,2))
-    >>> values == {'1', '2', '4'}
-    True
-    >>> values = find_possible_values(grid, (4,7))
-    >>> values == {'2', '5', '9'}
-    True
-    """
-    pass
+    free_values_in_sectror = UNIVERSAL_SET - sector_values
+    posible_values_set = set()
+    for free_element in free_values_in_sectror:
+        if any([free_element in row, free_element in col]):
+            continue
+
+        posible_values_set.add(free_element)
+    
+    return posible_values_set
 
 
 def solve(grid: tp.List[tp.List[str]]) -> tp.Optional[tp.List[tp.List[str]]]:
