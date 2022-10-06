@@ -100,7 +100,7 @@ def find_empty_positions(grid: tp.List[tp.List[str]]) -> tp.Optional[tp.Tuple[in
 
 
 def find_possible_values(grid: tp.List[tp.List[str]], pos: tp.Tuple[int, int]) -> tp.Set[str]:
-    """Вернуть множество возможных значения для указанной позиции """
+    """ Вернуть множество возможных значения для указанной позиции """
     row, col = get_row(grid, pos), get_col(grid, pos)
     sector_values = set(get_block(grid, pos))
 
@@ -117,18 +117,38 @@ def find_possible_values(grid: tp.List[tp.List[str]], pos: tp.Tuple[int, int]) -
 
 def solve(grid: tp.List[tp.List[str]]) -> tp.Optional[tp.List[tp.List[str]]]:
     """ Решение пазла, заданного в grid """
-    """ Как решать Судоку?
-        1. Найти свободную позицию
-        2. Найти все возможные значения, которые могут находиться на этой позиции
-        3. Для каждого возможного значения:
-            3.1. Поместить это значение на эту позицию
-            3.2. Продолжить решать оставшуюся часть пазла
 
-    >>> grid = read_sudoku('puzzle1.txt')
-    >>> solve(grid)
-    [['5', '3', '4', '6', '7', '8', '9', '1', '2'], ['6', '7', '2', '1', '9', '5', '3', '4', '8'], ['1', '9', '8', '3', '4', '2', '5', '6', '7'], ['8', '5', '9', '7', '6', '1', '4', '2', '3'], ['4', '2', '6', '8', '5', '3', '7', '9', '1'], ['7', '1', '3', '9', '2', '4', '8', '5', '6'], ['9', '6', '1', '5', '3', '7', '2', '8', '4'], ['2', '8', '7', '4', '1', '9', '6', '3', '5'], ['3', '4', '5', '2', '8', '6', '1', '7', '9']]
-    """
-    pass
+    # перемнная, в которое помещается решение судоку (по умолчанию None)
+    solving_grid = None
+    def search(local_grid: tp.List[tp.List[str]]) -> None:
+        """ Рекурсивная функция для поиска решения """
+        nonlocal solving_grid
+
+        empty_positions = find_empty_positions(local_grid)
+
+        # (блок if)
+        # проверяем, остались ли еще незаполненные поля
+        #
+        # (блок else)
+        # если пустых полей нет, значит мы нашли решение
+        # в переменную solving_grid присваиваем новый объект list
+        if empty_positions is not None:
+            possible_values_set = find_possible_values(local_grid, empty_positions)
+
+            # если нет вариантов для решения, то дальше не идем
+            if not possible_values_set:
+                 return
+            
+            row_empty_position, col_empty_position = empty_positions
+            for values in possible_values_set:
+                local_grid[row_empty_position][col_empty_position] = values
+                search(local_grid)
+                local_grid[row_empty_position][col_empty_position] = '.'
+        else:
+            solving_grid = solving_grid = [row.copy() for row in local_grid]
+
+    search(grid.copy())
+    return solving_grid
 
 
 def check_solution(solution: tp.List[tp.List[str]]) -> bool:
