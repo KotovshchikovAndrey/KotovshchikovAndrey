@@ -1,7 +1,7 @@
 import pathlib
-import typing as tp
 import random
 import time
+import typing as tp
 
 # размер игрового
 FIELD_SIZE = (9, 9)
