@@ -161,7 +161,6 @@ def check_solution(solution: tp.List[tp.List[str]]) -> bool:
             # объединенное множество
             union_set = set(row_values_list) | set(col_values_list) | set(sector_values_list)
 
-
             # кортех условий, при которых решение верно
             is_solution_tuple = (
                 len(row_values_list) == len(set(row_values_list)),
