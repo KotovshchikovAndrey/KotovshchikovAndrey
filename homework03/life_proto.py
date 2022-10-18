@@ -32,9 +32,11 @@ class GameOfLife:
     def draw_lines(self) -> None:
         """ Отрисовать сетку """
         for x in range(0, self.width, self.cell_size):
-            pygame.draw.line(self.screen, pygame.Color("black"), (x, 0), (x, self.height))
+            pygame.draw.line(self.screen, pygame.Color(
+                "black"), (x, 0), (x, self.height))
         for y in range(0, self.height, self.cell_size):
-            pygame.draw.line(self.screen, pygame.Color("black"), (0, y), (self.width, y))
+            pygame.draw.line(self.screen, pygame.Color(
+                "black"), (0, y), (self.width, y))
 
     def run(self) -> None:
         """ Запустить игру """
@@ -62,24 +64,11 @@ class GameOfLife:
         pygame.quit()
 
     def create_grid(self, randomize: bool = False) -> Grid:
-        """
-        Создание списка клеток.
+        """Создание списка клеток"""
+        if not randomize:
+            return [[0] * self.cell_width] * self.height
 
-        Клетка считается живой, если ее значение равно 1, в противном случае клетка
-        считается мертвой, то есть, ее значение равно 0.
-
-        Parameters
-        ----------
-        randomize : bool
-            Если значение истина, то создается матрица, где каждая клетка может
-            быть равновероятно живой или мертвой, иначе все клетки создаются мертвыми.
-
-        Returns
-        ----------
-        out : Grid
-            Матрица клеток размером `cell_height` х `cell_width`.
-        """
-        pass
+        return [[random.randint(0, 1) for _ in range(self.cell_width)] for _ in range(self.cell_height)]
 
     def draw_grid(self) -> None:
         """
@@ -89,23 +78,30 @@ class GameOfLife:
 
     def get_neighbours(self, cell: Cell) -> Cells:
         """
-        Вернуть список соседних клеток для клетки `cell`.
-
-        Соседними считаются клетки по горизонтали, вертикали и диагоналям,
-        то есть, во всех направлениях.
-
-        Parameters
-        ----------
-        cell : Cell
-            Клетка, для которой необходимо получить список соседей. Клетка
-            представлена кортежем, содержащим ее координаты на игровом поле.
-
-        Returns
-        ----------
-        out : Cells
-            Список соседних клеток.
+        Получение списка соседних клеток.
         """
-        pass
+        row_position, col_position = cell
+        neighbours_positions_tuple = (
+            (row_position, col_position - 1),
+            (row_position - 1, col_position),
+            (row_position, col_position + 1),
+            (row_position + 1, col_position),
+            (row_position - 1, col_position - 1),
+            (row_position - 1, col_position + 1),
+            (row_position + 1, col_position - 1),
+            (row_position + 1, col_position + 1),
+        )
+
+        neighbours_list = []
+        for row_index, col_index in neighbours_positions_tuple:
+            try:
+                neighbour_cell = self.grid[row_index][col_index]
+            except IndexError:
+                continue
+            else:
+                neighbours_list.append(neighbour_cell)
+
+        return neighbours_list
 
     def get_next_generation(self) -> Grid:
         """
