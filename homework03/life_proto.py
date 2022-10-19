@@ -72,7 +72,7 @@ class GameOfLife:
     def create_grid(self, randomize: bool = False) -> Grid:
         """Создание списка клеток"""
         if not randomize:
-            return [[0 for _ in range(self.cell_width)] for _ in range(self.height)]
+            return [[0 for _ in range(self.cell_width)] for _ in range(self.cell_height)]
 
         return [[random.randint(0, 1) for _ in range(self.cell_width)] for _ in range(self.cell_height)]
 
