@@ -66,7 +66,7 @@ class GameOfLife:
     def create_grid(self, randomize: bool = False) -> Grid:
         """Создание списка клеток"""
         if not randomize:
-            return [[0] * self.cell_width] * self.height
+            return [[0 for _ in range(self.cell_width)] for _ in range(self.height)]
 
         return [[random.randint(0, 1) for _ in range(self.cell_width)] for _ in range(self.cell_height)]
 
@@ -94,11 +94,15 @@ class GameOfLife:
 
         neighbours_list = []
         for row_index, col_index in neighbours_positions_tuple:
+            if row_index < 0 or col_index < 0:
+                continue
+
             try:
                 neighbour_cell = self.grid[row_index][col_index]
             except IndexError:
                 continue
             else:
+                print(neighbour_cell, row_index, col_index)
                 neighbours_list.append(neighbour_cell)
 
         return neighbours_list
@@ -106,10 +110,19 @@ class GameOfLife:
     def get_next_generation(self) -> Grid:
         """
         Получить следующее поколение клеток.
-
-        Returns
-        ----------
-        out : Grid
-            Новое поколение клеток.
         """
-        pass
+        new_grid = self.grid.copy()
+        for row_index in range(self.cell_height):
+            for col_index in range(self.cell_width):
+                # если существо мертво, то нет смысла обнулять его еще раз
+                if new_grid[row_index][col_index] == 0:
+                    continue
+
+                neighbours_list = self.get_neighbours((row_index, col_index))
+                alive_neighbours_count = sum(neighbours_list)
+                if alive_neighbours_count in (2, 3):
+                    continue
+
+                new_grid[row_index][col_index] = 0
+
+        return new_grid

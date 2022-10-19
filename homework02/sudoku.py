@@ -207,10 +207,23 @@ def generate_sudoku(N: int) -> tp.List[tp.List[str]]:
     return sudoku
 
 
-def _hard_puzzles_generator(values: str, n: int) -> tp.Generator:
-    for i in range(0, len(values) // n**2, n**2):
-        group_puzzle = group(list(values[i : i + n**2]), n)
-        yield group_puzzle
+def _get_puzzle(grid: tp.List[tp.List[str]]) -> tp.List[str]:
+    """Возвращает все значения из квадрата, в который попадает позиция pos"""
+    puzzle = []
+    for j in range(0, FIELD_SIZE[0], FIELD_SIZE[1]):
+        puzzle.extend(grid[j][:FIELD_SIZE[1] + 1])
+
+    return puzzle
+
+
+def _hard_puzzles_generator(puzzle_list: tp.List[tp.List[str]]) -> tp.Generator:
+    for j in range(len(puzzle_list[0]) // FIELD_SIZE[1]):
+        puzzles = []
+        col_index = j * FIELD_SIZE[1]
+        for row_index in range(len(puzzle_list)):
+            puzzles.append(puzzle_list[row_index][col_index:col_index + FIELD_SIZE[1]])
+
+        yield puzzles
 
 
 def run_solve(puzzle: tp.List[tp.List[str]]) -> None:
@@ -227,11 +240,22 @@ def run_solve(puzzle: tp.List[tp.List[str]]) -> None:
 if __name__ == "__main__":
     import multiprocessing
 
-    path = pathlib.Path("hard_puzzles.txt")
-    with path.open() as f:
-        values = f.read()
+    with open('hard_puzzles.txt') as f:
+        puzzles = [list(row.strip()) for row in f.readlines()]
 
-    puzzles_generator = _hard_puzzles_generator(values, 9)
-    for puzzle in puzzles_generator:
-        process = multiprocessing.Process(target=run_solve, kwargs={"puzzle": puzzle})
-        process.start()
+    # grid = 
+    import time
+    for puzzle in _hard_puzzles_generator(puzzles):
+        # print(puzzles)
+        print(len(puzzle), len(puzzle[0]))
+        break
+    
+    # path = pathlib.Path("hard_puzzles.txt")
+    # with path.open() as f:
+    #     values = f.read()
+
+    # puzzles_generator = _hard_puzzles_generator(values, 9)
+    # print(next(puzzles_generator))
+    # for puzzle in puzzles_generator:
+    #     process = multiprocessing.Process(target=run_solve, kwargs={"puzzle": puzzle})
+    #     process.start()

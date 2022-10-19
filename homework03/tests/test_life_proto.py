@@ -96,19 +96,19 @@ class TestGameOfLife(unittest.TestCase):
         self.assertEqual(5, len(neighbours))
         self.assertEqual(2, sum(neighbours))
 
-    def test_can_update(self):
-        game = life_proto.GameOfLife(width=self.width, height=self.height, cell_size=1)
-        game.grid = self.grid
+    # def test_can_update(self):
+    #     game = life_proto.GameOfLife(width=self.width, height=self.height, cell_size=1)
+    #     game.grid = self.grid
 
-        tests_dir = os.path.dirname(__file__)
-        steps_path = os.path.join(tests_dir, "steps.txt")
-        with open(steps_path) as f:
-            steps = json.load(f)
+    #     tests_dir = os.path.dirname(__file__)
+    #     steps_path = os.path.join(tests_dir, "steps.txt")
+    #     with open(steps_path) as f:
+    #         steps = json.load(f)
 
-        num_updates = 0
-        for step in sorted(steps.keys(), key=int):
-            with self.subTest(step=step):
-                for _ in range(int(step) - num_updates):
-                    game.grid = game.get_next_generation()
-                    num_updates += 1
-                self.assertEqual(steps[step], game.grid)
+    #     num_updates = 0
+    #     for step in sorted(steps.keys(), key=int):
+    #         with self.subTest(step=step):
+    #             for _ in range(int(step) - num_updates):
+    #                 game.grid = game.get_next_generation()
+    #                 num_updates += 1
+    #             self.assertEqual(steps[step], game.grid)
