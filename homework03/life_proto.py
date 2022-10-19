@@ -102,7 +102,6 @@ class GameOfLife:
             except IndexError:
                 continue
             else:
-                print(neighbour_cell, row_index, col_index)
                 neighbours_list.append(neighbour_cell)
 
         return neighbours_list
@@ -111,18 +110,14 @@ class GameOfLife:
         """
         Получить следующее поколение клеток.
         """
-        new_grid = self.grid.copy()
+        new_grid = [row.copy() for row in self.grid]
         for row_index in range(self.cell_height):
             for col_index in range(self.cell_width):
-                # если существо мертво, то нет смысла обнулять его еще раз
-                if new_grid[row_index][col_index] == 0:
-                    continue
-
                 neighbours_list = self.get_neighbours((row_index, col_index))
                 alive_neighbours_count = sum(neighbours_list)
-                if alive_neighbours_count in (2, 3):
-                    continue
-
-                new_grid[row_index][col_index] = 0
+                if (self.grid[row_index][col_index] == 0) and (alive_neighbours_count == 3):
+                    new_grid[row_index][col_index] = 1
+                elif (self.grid[row_index][col_index] == 1) and (alive_neighbours_count not in (2, 3)):
+                    new_grid[row_index][col_index] = 0
 
         return new_grid
