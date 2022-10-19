@@ -29,6 +29,12 @@ class GameOfLife:
         # Скорость протекания игры
         self.speed = speed
 
+        # Цвета, в которые могут окрашиваться клетки
+        self._rect_colors = {
+            'alive_color': pygame.Color('green'),
+            'dead_color': pygame.Color('white'),
+        }
+
     def draw_lines(self) -> None:
         """ Отрисовать сетку """
         for x in range(0, self.width, self.cell_size):
@@ -74,13 +80,24 @@ class GameOfLife:
         """
         Отрисовка списка клеток с закрашиванием их в соответствующе цвета.
         """
-        pass
+        for row_index in range(self.cell_height):
+            for col_index in range(self.cell_width):
+                rect_value = self.grid[row_index][col_index]
+                color = self._rect_colors['dead_color'] if not rect_value else self._rect_colors['alive_color']
+
+                pygame.draw.rect(
+                    surface=self.screen,
+                    color=color,
+                    rect=(row_index, col_index, self.cell_size, self.cell_size)
+                )
 
     def get_neighbours(self, cell: Cell) -> Cells:
         """
         Получение списка соседних клеток.
         """
         row_position, col_position = cell
+
+        # Все возможные соседние позиции
         neighbours_positions_tuple = (
             (row_position, col_position - 1),
             (row_position - 1, col_position),
@@ -94,6 +111,7 @@ class GameOfLife:
 
         neighbours_list = []
         for row_index, col_index in neighbours_positions_tuple:
+            # Если координаты позиции отрицательные => такой позиции не существует
             if row_index < 0 or col_index < 0:
                 continue
 
@@ -113,11 +131,16 @@ class GameOfLife:
         new_grid = [row.copy() for row in self.grid]
         for row_index in range(self.cell_height):
             for col_index in range(self.cell_width):
+                # Получаем список из соседей каждой клетки и количество живых клеток
                 neighbours_list = self.get_neighbours((row_index, col_index))
                 alive_neighbours_count = sum(neighbours_list)
-                if (self.grid[row_index][col_index] == 0) and (alive_neighbours_count == 3):
+
+                # Если клетка мертва и количество живых соседей == 3, делаем ее живой
+                #
+                # Если же клетка жива и количество живых соседий от 2 до 3, делаем ее мертвой
+                if (not self.grid[row_index][col_index]) and (alive_neighbours_count == 3):
                     new_grid[row_index][col_index] = 1
-                elif (self.grid[row_index][col_index] == 1) and (alive_neighbours_count not in (2, 3)):
+                elif (self.grid[row_index][col_index]) and (alive_neighbours_count not in (2, 3)):
                     new_grid[row_index][col_index] = 0
 
         return new_grid
