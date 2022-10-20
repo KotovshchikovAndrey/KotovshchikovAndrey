@@ -15,15 +15,9 @@ class GameOfLife:
         size: tp.Tuple[int, int],
         randomize: bool = True,
         max_generations: tp.Optional[float] = float("inf"),
-        cell_size: int = 10,
     ) -> None:
-        # Размер клеточного поля
-        self.width, self.height = size
-        # Размер квадрата
-        self.cell_size = cell_size
-
         # Количество ячеек по вертикали и горизонтали
-        self.cell_width, self.cell_height = size
+        self.cell_height, self.cell_width = size
         # Предыдущее поколение клеток
         self.prev_generation = self.create_grid()
         # Текущее поколение клеток
