@@ -124,3 +124,8 @@ class GameOfLife:
         Сохранить текущее состояние клеток в указанный файл.
         """
         pass
+
+    def change_curr_generation_grid(self, row_index: int, col_index: int) -> None:
+        "Изменяет текущее состояние клеток"
+        curr_value = self.curr_generation[row_index][col_index]
+        self.curr_generation[row_index][col_index] = 1 if not curr_value else 0

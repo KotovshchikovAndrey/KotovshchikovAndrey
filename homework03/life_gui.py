@@ -39,20 +39,37 @@ class GUI(UI):
         self.screen.fill(pygame.Color("white"))
 
         running = True
+        is_pause = True
         while running:
             for event in pygame.event.get():
                 if event.type == QUIT:
                     running = False
 
+                if event.type == pygame.KEYDOWN:
+                    if event.key == pygame.K_f:
+                        is_pause = not is_pause
+
+                if event.type == pygame.MOUSEBUTTONUP:
+                    x_position, y_position = pygame.mouse.get_pos()
+                    self._select_rect(x_position, y_position)
+
             # Отрисовка списка клеток
             # Выполнение одного шага игры (обновление состояния ячеек)
             self.draw_grid()
             self.draw_lines()
-            self.life.step()
+            if not is_pause:
+                self.life.step()
 
             pygame.display.flip()
             clock.tick(self.speed)
+
         pygame.quit()
+
+    def _select_rect(self, x_position: int, y_position: int) -> None:
+        "Помечает клетку на игровом поле"
+        row_index, col_index = y_position // self.cell_size, x_position // self.cell_size
+        # Вызываем метод для обновления состояния текущей клетки у объекта с бизнес логикой
+        self.life.change_curr_generation_grid(row_index, col_index)
 
     def draw_lines(self) -> None:
         """ Отрисовать сетку """
@@ -75,7 +92,7 @@ class GUI(UI):
                 pygame.draw.rect(
                     surface=self.screen,
                     color=color,
-                    rect=(row_index * self.cell_size, col_index * self.cell_size,
+                    rect=(col_index * self.cell_size, row_index * self.cell_size,
                           self.cell_size, self.cell_size)
                 )
 
@@ -83,7 +100,7 @@ class GUI(UI):
 if __name__ == '__main__':
     game = GameOfLife(
         size=(20, 20),
-        randomize=True,
+        randomize=False,
         max_generations=100
     )
     gui = GUI(

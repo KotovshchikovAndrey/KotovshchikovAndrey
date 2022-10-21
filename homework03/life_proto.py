@@ -88,7 +88,7 @@ class GameOfLife:
                 pygame.draw.rect(
                     surface=self.screen,
                     color=color,
-                    rect=(row_index, col_index, self.cell_size, self.cell_size)
+                    rect=(col_index, row_index, self.cell_size, self.cell_size)
                 )
 
     def get_neighbours(self, cell: Cell) -> Cells:
