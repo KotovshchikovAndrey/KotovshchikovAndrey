@@ -111,30 +111,31 @@ class TestGameOfLife(unittest.TestCase):
                     num_updates += 1
                 self.assertEqual(steps[step], game.curr_generation)
 
-    # def test_prev_generation_is_correct(self):
-    #     game = life.GameOfLife((self.rows, self.cols))
-    #     game.curr_generation = self.grid
-    #     game.step()
-    #     self.assertEqual(game.prev_generation, self.grid)
+    def test_prev_generation_is_correct(self):
+        game = life.GameOfLife((self.rows, self.cols))
+        game.curr_generation = self.grid
+        game.step()
+        self.assertEqual(game.prev_generation, self.grid)
 
-    # def test_is_max_generations_exceeded(self):
-    #     max_generations = 4
-    #     game = life.GameOfLife((self.rows, self.cols), max_generations=max_generations)
-    #     game.curr_generation = self.grid
-    #     for _ in range(max_generations - 1):
-    #         game.step()
-    #     self.assertEqual(game.generations, max_generations)
-    #     self.assertTrue(game.is_max_generations_exceeded)
+    def test_is_max_generations_exceeded(self):
+        max_generations = 4
+        game = life.GameOfLife((self.rows, self.cols),
+                               max_generations=max_generations)
+        game.curr_generation = self.grid
+        for _ in range(max_generations - 1):
+            game.step()
+        self.assertEqual(game.generations, max_generations)
+        self.assertTrue(game.is_max_generations_exceeded)
 
-    # def test_is_changing(self):
-    #     game = life.GameOfLife((self.rows, self.cols))
-    #     game.curr_generation = self.grid
-    #     game.step()
-    #     self.assertTrue(game.is_changing)
+    def test_is_changing(self):
+        game = life.GameOfLife((self.rows, self.cols))
+        game.curr_generation = self.grid
+        game.step()
+        self.assertTrue(game.is_changing)
 
-    # def test_is_not_changing(self):
-    #     game = life.GameOfLife((self.rows, self.cols))
-    #     game.curr_generation = self.grid
-    #     for _ in range(self.max_generations + 1):
-    #         game.step()
-    #     self.assertFalse(game.is_changing)
+    def test_is_not_changing(self):
+        game = life.GameOfLife((self.rows, self.cols))
+        game.curr_generation = self.grid
+        for _ in range(self.max_generations + 1):
+            game.step()
+        self.assertFalse(game.is_changing)

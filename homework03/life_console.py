@@ -26,7 +26,7 @@ class Console(UI):
             # Вычисляем среднюю позицию по строке
             middle_row_position = num_rows // 2 - self.life.cell_height // 2 + row_index
 
-            # Получаем колонку в виде строки
+            # Склеиваем текущую строку матрицы в str тип и заменяем 0 на ' ' и 1 на *
             row_string = " ".join((' ' if value else '*' for value in row))
             try:
                 self._screen.addstr(middle_row_position,
