@@ -29,9 +29,7 @@ class Console(UI):
             # Склеиваем текущую строку матрицы в str тип и заменяем 0 на ' ' и 1 на *
             row_string = " ".join((" " if value else "*" for value in row))
             try:
-                self._screen.addstr(
-                    middle_row_position, middle_col_position, row_string
-                )
+                self._screen.addstr(middle_row_position, middle_col_position, row_string)
             except curses.error:
                 pass
 
