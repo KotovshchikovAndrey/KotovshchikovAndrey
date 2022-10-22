@@ -2,7 +2,7 @@ import random
 import typing as tp
 
 import pygame
-from pygame.locals import *
+from pygame.locals import QUIT
 
 Cell = tp.Tuple[int, int]
 Cells = tp.List[int]
