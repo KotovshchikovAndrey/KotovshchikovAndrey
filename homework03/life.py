@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import pathlib
 import random
 import typing as tp
@@ -120,7 +122,7 @@ class GameOfLife:
         return self.curr_generation != self.prev_generation
 
     @staticmethod
-    def from_file(filename: pathlib.Path) -> "GameOfLife":
+    def from_file(filename: pathlib.Path) -> GameOfLife:
         """
         Прочитать состояние клеток из указанного файла.
         """
