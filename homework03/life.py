@@ -112,6 +112,8 @@ class GameOfLife:
         """
         Не превысило ли текущее число поколений максимально допустимое.
         """
+        # Для mypy указываем увереннность, что значение не None
+        assert self.max_generations is not None
         return self.generations >= self.max_generations
 
     @property

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 import random
 import typing as tp
 
@@ -10,6 +12,8 @@ Grid = tp.List[Cells]
 
 
 class GameOfLife:
+    grid: Grid
+
     def __init__(
         self, width: int = 640, height: int = 480, cell_size: int = 10, speed: int = 10
     ) -> None:
