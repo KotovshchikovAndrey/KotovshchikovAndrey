@@ -3,7 +3,7 @@ import typing as tp
 
 import pygame
 from life import GameOfLife
-from pygame.locals import QUIT
+from pygame import QUIT
 from ui import UI
 
 
