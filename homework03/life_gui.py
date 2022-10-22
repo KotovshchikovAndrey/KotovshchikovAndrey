@@ -4,6 +4,8 @@ from life import GameOfLife
 from pygame.locals import *
 from ui import UI
 
+import pathlib
+
 
 class GUI(UI):
     def __init__(
@@ -100,7 +102,7 @@ class GUI(UI):
 if __name__ == '__main__':
     game = GameOfLife(
         size=(20, 20),
-        randomize=False,
+        randomize=True,
         max_generations=100
     )
     gui = GUI(
@@ -108,3 +110,14 @@ if __name__ == '__main__':
         cell_size=32
     )
     gui.run()
+
+    # try:
+    #     game = GameOfLife.from_file(pathlib.Path('grid.txt'))
+    # except Exception as e:
+    #     print(f'Не удалось прочитать файл: {e}')
+    # else:
+    #     gui = GUI(
+    #         life=game,
+    #         cell_size=32
+    #     )
+    #     gui.run()

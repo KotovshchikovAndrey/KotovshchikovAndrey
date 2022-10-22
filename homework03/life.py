@@ -15,13 +15,15 @@ class GameOfLife:
         size: tp.Tuple[int, int],
         randomize: bool = True,
         max_generations: tp.Optional[float] = float("inf"),
+        grid: tp.Optional[Grid] = None
     ) -> None:
         # Количество ячеек по вертикали и горизонтали
         self.cell_height, self.cell_width = size
         # Предыдущее поколение клеток
         self.prev_generation = self.create_grid()
         # Текущее поколение клеток
-        self.curr_generation = self.create_grid(randomize=randomize)
+        self.curr_generation = grid if grid is not None else \
+            self.create_grid(randomize=randomize)
         # Максимальное число поколений
         self.max_generations = max_generations
         # Текущее число поколений
@@ -117,13 +119,22 @@ class GameOfLife:
         """
         Прочитать состояние клеток из указанного файла.
         """
-        pass
+        grid_string = filename.read_text()
+        grid_list = [[int(value) for value in row]
+                     for row in grid_string.split()]
+
+        return GameOfLife(
+            grid=grid_list,
+            size=(len(grid_list), len(grid_list[0]))
+        )
 
     def save(self, filename: pathlib.Path) -> None:
         """
         Сохранить текущее состояние клеток в указанный файл.
         """
-        pass
+        grid_string = '\n'.join(''.join(str(value) for value in row)
+                                for row in self.curr_generation)
+        filename.write_text(grid_string)
 
     def change_curr_generation_grid(self, row_index: int, col_index: int) -> None:
         "Изменяет текущее состояние клеток"
