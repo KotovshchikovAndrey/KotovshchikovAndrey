@@ -34,80 +34,70 @@ class TestGameOfLife(unittest.TestCase):
         self.assertEqual([[1, 0, 1], [1, 0, 1], [1, 0, 1]], grid)
 
     def test_get_neighbours(self):
-        game = life_proto.GameOfLife(
-            width=self.width, height=self.height, cell_size=1)
+        game = life_proto.GameOfLife(width=self.width, height=self.height, cell_size=1)
         game.grid = self.grid
         neighbours = game.get_neighbours((2, 3))
         self.assertEqual(8, len(neighbours))
         self.assertEqual(4, sum(neighbours))
 
     def test_get_neighbours_for_upper_left_corner(self):
-        game = life_proto.GameOfLife(
-            width=self.width, height=self.height, cell_size=1)
+        game = life_proto.GameOfLife(width=self.width, height=self.height, cell_size=1)
         game.grid = self.grid
         neighbours = game.get_neighbours((0, 0))
         self.assertEqual(3, len(neighbours))
         self.assertEqual(2, sum(neighbours))
 
     def test_get_neighbours_for_upper_right_corner(self):
-        game = life_proto.GameOfLife(
-            width=self.width, height=self.height, cell_size=1)
+        game = life_proto.GameOfLife(width=self.width, height=self.height, cell_size=1)
         game.grid = self.grid
         neighbours = game.get_neighbours((0, 7))
         self.assertEqual(3, len(neighbours))
         self.assertEqual(2, sum(neighbours))
 
     def test_get_neighbours_for_lower_left_corner(self):
-        game = life_proto.GameOfLife(
-            width=self.width, height=self.height, cell_size=1)
+        game = life_proto.GameOfLife(width=self.width, height=self.height, cell_size=1)
         game.grid = self.grid
         neighbours = game.get_neighbours((5, 0))
         self.assertEqual(3, len(neighbours))
         self.assertEqual(2, sum(neighbours))
 
     def test_get_neighbours_for_lower_right_corner(self):
-        game = life_proto.GameOfLife(
-            width=self.width, height=self.height, cell_size=1)
+        game = life_proto.GameOfLife(width=self.width, height=self.height, cell_size=1)
         game.grid = self.grid
         neighbours = game.get_neighbours((5, 7))
         self.assertEqual(3, len(neighbours))
         self.assertEqual(1, sum(neighbours))
 
     def test_get_neighbours_for_upper_side(self):
-        game = life_proto.GameOfLife(
-            width=self.width, height=self.height, cell_size=1)
+        game = life_proto.GameOfLife(width=self.width, height=self.height, cell_size=1)
         game.grid = self.grid
         neighbours = game.get_neighbours((0, 3))
         self.assertEqual(5, len(neighbours))
         self.assertEqual(4, sum(neighbours))
 
     def test_get_neighbours_for_bottom_side(self):
-        game = life_proto.GameOfLife(
-            width=self.width, height=self.height, cell_size=1)
+        game = life_proto.GameOfLife(width=self.width, height=self.height, cell_size=1)
         game.grid = self.grid
         neighbours = game.get_neighbours((5, 3))
         self.assertEqual(5, len(neighbours))
         self.assertEqual(4, sum(neighbours))
 
     def test_get_neighbours_for_left_side(self):
-        game = life_proto.GameOfLife(
-            width=self.width, height=self.height, cell_size=1)
+        game = life_proto.GameOfLife(width=self.width, height=self.height, cell_size=1)
         game.grid = self.grid
         neighbours = game.get_neighbours((2, 0))
         self.assertEqual(5, len(neighbours))
         self.assertEqual(2, sum(neighbours))
 
     def test_get_neighbours_for_right_side(self):
-        game = life_proto.GameOfLife(
-            width=self.width, height=self.height, cell_size=1)
+        game = life_proto.GameOfLife(width=self.width, height=self.height, cell_size=1)
         game.grid = self.grid
         neighbours = game.get_neighbours((2, 7))
         self.assertEqual(5, len(neighbours))
         self.assertEqual(2, sum(neighbours))
 
     def test_can_update(self):
-        game = life_proto.GameOfLife(
-            width=self.width, height=self.height, cell_size=1)
+        game = life_proto.GameOfLife(width=self.width, height=self.height, cell_size=1)
         game.grid = self.grid
 
         tests_dir = os.path.dirname(__file__)

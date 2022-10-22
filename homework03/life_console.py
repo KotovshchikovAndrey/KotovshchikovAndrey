@@ -12,11 +12,11 @@ class Console(UI):
         self._screen = curses.initscr()
 
     def draw_borders(self) -> None:
-        """ Отобразить рамку. """
-        self._screen.border('|', '|', '-', '-', '+', '+', '+', '+')
+        """Отобразить рамку."""
+        self._screen.border("|", "|", "-", "-", "+", "+", "+", "+")
 
     def draw_grid(self) -> None:
-        """ Отобразить состояние клеток. """
+        """Отобразить состояние клеток."""
         # Получаем количество строк и колонок в консольном поле
         num_rows, num_cols = self._screen.getmaxyx()
 
@@ -27,10 +27,11 @@ class Console(UI):
             middle_row_position = num_rows // 2 - self.life.cell_height // 2 + row_index
 
             # Склеиваем текущую строку матрицы в str тип и заменяем 0 на ' ' и 1 на *
-            row_string = " ".join((' ' if value else '*' for value in row))
+            row_string = " ".join((" " if value else "*" for value in row))
             try:
-                self._screen.addstr(middle_row_position,
-                                    middle_col_position, row_string)
+                self._screen.addstr(
+                    middle_row_position, middle_col_position, row_string
+                )
             except curses.error:
                 pass
 
@@ -49,13 +50,7 @@ class Console(UI):
                 break
 
 
-if __name__ == '__main__':
-    game = GameOfLife(
-        size=(20, 20),
-        randomize=True,
-        max_generations=100
-    )
-    console = Console(
-        life=game
-    )
+if __name__ == "__main__":
+    game = GameOfLife(size=(20, 20), randomize=True, max_generations=100)
+    console = Console(life=game)
     console.run()

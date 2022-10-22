@@ -15,15 +15,16 @@ class GameOfLife:
         size: tp.Tuple[int, int],
         randomize: bool = True,
         max_generations: tp.Optional[float] = float("inf"),
-        grid: tp.Optional[Grid] = None
+        grid: tp.Optional[Grid] = None,
     ) -> None:
         # Количество ячеек по вертикали и горизонтали
         self.cell_height, self.cell_width = size
         # Предыдущее поколение клеток
         self.prev_generation = self.create_grid()
         # Текущее поколение клеток
-        self.curr_generation = grid if grid is not None else \
-            self.create_grid(randomize=randomize)
+        self.curr_generation = (
+            grid if grid is not None else self.create_grid(randomize=randomize)
+        )
         # Максимальное число поколений
         self.max_generations = max_generations
         # Текущее число поколений
@@ -32,9 +33,14 @@ class GameOfLife:
     def create_grid(self, randomize: bool = False) -> Grid:
         """Создание списка клеток"""
         if not randomize:
-            return [[0 for _ in range(self.cell_width)] for _ in range(self.cell_height)]
+            return [
+                [0 for _ in range(self.cell_width)] for _ in range(self.cell_height)
+            ]
 
-        return [[random.randint(0, 1) for _ in range(self.cell_width)] for _ in range(self.cell_height)]
+        return [
+            [random.randint(0, 1) for _ in range(self.cell_width)]
+            for _ in range(self.cell_height)
+        ]
 
     def get_neighbours(self, cell: Cell) -> Cells:
         """
@@ -83,9 +89,13 @@ class GameOfLife:
                 # Если клетка мертва и количество живых соседей == 3, делаем ее живой
                 #
                 # Если же клетка жива и количество живых соседий от 2 до 3, делаем ее мертвой
-                if (not self.curr_generation[row_index][col_index]) and (alive_neighbours_count == 3):
+                if (not self.curr_generation[row_index][col_index]) and (
+                    alive_neighbours_count == 3
+                ):
                     new_grid[row_index][col_index] = 1
-                elif (self.curr_generation[row_index][col_index]) and (alive_neighbours_count not in (2, 3)):
+                elif (self.curr_generation[row_index][col_index]) and (
+                    alive_neighbours_count not in (2, 3)
+                ):
                     new_grid[row_index][col_index] = 0
 
         return new_grid
@@ -94,8 +104,10 @@ class GameOfLife:
         """
         Выполнить один шаг игры.
         """
-        self.prev_generation, self.curr_generation = \
-            self.curr_generation, self.get_next_generation()
+        self.prev_generation, self.curr_generation = (
+            self.curr_generation,
+            self.get_next_generation(),
+        )
 
         # Инкрементируем количество созданных поколений
         self.generations += 1
@@ -120,20 +132,17 @@ class GameOfLife:
         Прочитать состояние клеток из указанного файла.
         """
         grid_string = filename.read_text()
-        grid_list = [[int(value) for value in row]
-                     for row in grid_string.split()]
+        grid_list = [[int(value) for value in row] for row in grid_string.split()]
 
-        return GameOfLife(
-            grid=grid_list,
-            size=(len(grid_list), len(grid_list[0]))
-        )
+        return GameOfLife(grid=grid_list, size=(len(grid_list), len(grid_list[0])))
 
     def save(self, filename: pathlib.Path) -> None:
         """
         Сохранить текущее состояние клеток в указанный файл.
         """
-        grid_string = '\n'.join(''.join(str(value) for value in row)
-                                for row in self.curr_generation)
+        grid_string = "\n".join(
+            "".join(str(value) for value in row) for row in self.curr_generation
+        )
         filename.write_text(grid_string)
 
     def change_curr_generation_grid(self, row_index: int, col_index: int) -> None:

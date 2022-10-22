@@ -119,8 +119,7 @@ class TestGameOfLife(unittest.TestCase):
 
     def test_is_max_generations_exceeded(self):
         max_generations = 4
-        game = life.GameOfLife((self.rows, self.cols),
-                               max_generations=max_generations)
+        game = life.GameOfLife((self.rows, self.cols), max_generations=max_generations)
         game.curr_generation = self.grid
         for _ in range(max_generations - 1):
             game.step()
