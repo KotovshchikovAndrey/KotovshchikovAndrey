@@ -84,9 +84,13 @@ class GameOfLife:
                 # Если клетка мертва и количество живых соседей == 3, делаем ее живой
                 #
                 # Если же клетка жива и количество живых соседий от 2 до 3, делаем ее мертвой
-                if (not self.curr_generation[row_index][col_index]) and (alive_neighbours_count == 3):
+                if (not self.curr_generation[row_index][col_index]) and (
+                    alive_neighbours_count == 3
+                ):
                     new_grid[row_index][col_index] = 1
-                elif (self.curr_generation[row_index][col_index]) and (alive_neighbours_count not in (2, 3)):
+                elif (self.curr_generation[row_index][col_index]) and (
+                    alive_neighbours_count not in (2, 3)
+                ):
                     new_grid[row_index][col_index] = 0
 
         return new_grid
