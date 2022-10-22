@@ -3,8 +3,8 @@ import typing as tp
 
 import pygame
 from life import GameOfLife
-from ui import UI
 from pygame.locals import *
+from ui import UI
 
 
 class GUI(UI):
