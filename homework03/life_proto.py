@@ -1,8 +1,10 @@
+from __future__ import annotations
+
 import random
 import typing as tp
 
 import pygame
-from pygame.locals import *
+from pygame import QUIT
 
 Cell = tp.Tuple[int, int]
 Cells = tp.List[int]
@@ -10,6 +12,8 @@ Grid = tp.List[Cells]
 
 
 class GameOfLife:
+    grid: Grid
+
     def __init__(
         self, width: int = 640, height: int = 480, cell_size: int = 10, speed: int = 10
     ) -> None:
@@ -29,15 +33,21 @@ class GameOfLife:
         # Скорость протекания игры
         self.speed = speed
 
+        # Цвета, в которые могут окрашиваться клетки
+        self._rect_colors = {
+            "alive_color": pygame.Color("green"),
+            "dead_color": pygame.Color("white"),
+        }
+
     def draw_lines(self) -> None:
-        """ Отрисовать сетку """
+        """Отрисовать сетку"""
         for x in range(0, self.width, self.cell_size):
             pygame.draw.line(self.screen, pygame.Color("black"), (x, 0), (x, self.height))
         for y in range(0, self.height, self.cell_size):
             pygame.draw.line(self.screen, pygame.Color("black"), (0, y), (self.width, y))
 
     def run(self) -> None:
-        """ Запустить игру """
+        """Запустить игру"""
         pygame.init()
         clock = pygame.time.Clock()
         pygame.display.set_caption("Game of Life")
@@ -62,58 +72,83 @@ class GameOfLife:
         pygame.quit()
 
     def create_grid(self, randomize: bool = False) -> Grid:
-        """
-        Создание списка клеток.
+        """Создание списка клеток"""
+        if not randomize:
+            return [[0 for _ in range(self.cell_width)] for _ in range(self.cell_height)]
 
-        Клетка считается живой, если ее значение равно 1, в противном случае клетка
-        считается мертвой, то есть, ее значение равно 0.
-
-        Parameters
-        ----------
-        randomize : bool
-            Если значение истина, то создается матрица, где каждая клетка может
-            быть равновероятно живой или мертвой, иначе все клетки создаются мертвыми.
-
-        Returns
-        ----------
-        out : Grid
-            Матрица клеток размером `cell_height` х `cell_width`.
-        """
-        pass
+        return [
+            [random.randint(0, 1) for _ in range(self.cell_width)] for _ in range(self.cell_height)
+        ]
 
     def draw_grid(self) -> None:
         """
         Отрисовка списка клеток с закрашиванием их в соответствующе цвета.
         """
-        pass
+        for row_index in range(self.cell_height):
+            for col_index in range(self.cell_width):
+                rect_value = self.grid[row_index][col_index]
+                color = (
+                    self._rect_colors["dead_color"]
+                    if not rect_value
+                    else self._rect_colors["alive_color"]
+                )
+
+                pygame.draw.rect(
+                    surface=self.screen,
+                    color=color,
+                    rect=(col_index, row_index, self.cell_size, self.cell_size),
+                )
 
     def get_neighbours(self, cell: Cell) -> Cells:
         """
-        Вернуть список соседних клеток для клетки `cell`.
-
-        Соседними считаются клетки по горизонтали, вертикали и диагоналям,
-        то есть, во всех направлениях.
-
-        Parameters
-        ----------
-        cell : Cell
-            Клетка, для которой необходимо получить список соседей. Клетка
-            представлена кортежем, содержащим ее координаты на игровом поле.
-
-        Returns
-        ----------
-        out : Cells
-            Список соседних клеток.
+        Получение списка соседних клеток.
         """
-        pass
+        row_position, col_position = cell
+
+        # Все возможные соседние позиции
+        neighbours_positions_tuple = (
+            (row_position, col_position - 1),
+            (row_position - 1, col_position),
+            (row_position, col_position + 1),
+            (row_position + 1, col_position),
+            (row_position - 1, col_position - 1),
+            (row_position - 1, col_position + 1),
+            (row_position + 1, col_position - 1),
+            (row_position + 1, col_position + 1),
+        )
+
+        neighbours_list = []
+        for row_index, col_index in neighbours_positions_tuple:
+            # Если координаты позиции отрицательные => такой позиции не существует
+            if row_index < 0 or col_index < 0:
+                continue
+
+            try:
+                neighbour_cell = self.grid[row_index][col_index]
+            except IndexError:
+                continue
+            else:
+                neighbours_list.append(neighbour_cell)
+
+        return neighbours_list
 
     def get_next_generation(self) -> Grid:
         """
         Получить следующее поколение клеток.
-
-        Returns
-        ----------
-        out : Grid
-            Новое поколение клеток.
         """
-        pass
+        new_grid = [row.copy() for row in self.grid]
+        for row_index in range(self.cell_height):
+            for col_index in range(self.cell_width):
+                # Получаем список из соседей каждой клетки и количество живых клеток
+                neighbours_list = self.get_neighbours((row_index, col_index))
+                alive_neighbours_count = sum(neighbours_list)
+
+                # Если клетка мертва и количество живых соседей == 3, делаем ее живой
+                #
+                # Если же клетка жива и количество живых соседий от 2 до 3, делаем ее мертвой
+                if (not self.grid[row_index][col_index]) and (alive_neighbours_count == 3):
+                    new_grid[row_index][col_index] = 1
+                elif (self.grid[row_index][col_index]) and (alive_neighbours_count not in (2, 3)):
+                    new_grid[row_index][col_index] = 0
+
+        return new_grid
