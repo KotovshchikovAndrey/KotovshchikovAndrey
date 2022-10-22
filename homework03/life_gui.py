@@ -75,9 +75,13 @@ class GUI(UI):
     def draw_lines(self) -> None:
         """Отрисовать сетку"""
         for x in range(0, self.width, self.cell_size):
-            pygame.draw.line(self.screen, pygame.Color("black"), (x, 0), (x, self.height))
+            pygame.draw.line(
+                self.screen, pygame.Color("black"), (x, 0), (x, self.height)
+            )
         for y in range(0, self.height, self.cell_size):
-            pygame.draw.line(self.screen, pygame.Color("black"), (0, y), (self.width, y))
+            pygame.draw.line(
+                self.screen, pygame.Color("black"), (0, y), (self.width, y)
+            )
 
     def draw_grid(self) -> None:
         """
@@ -110,12 +114,9 @@ if __name__ == "__main__":
     # gui.run()
 
     try:
-        game = GameOfLife.from_file(pathlib.Path('grid.txt'))
+        game = GameOfLife.from_file(pathlib.Path("grid.txt"))
     except Exception as e:
-        print(f'Не удалось прочитать файл: {e}')
+        print(f"Не удалось прочитать файл: {e}")
     else:
-        gui = GUI(
-            life=game,
-            cell_size=32
-        )
+        gui = GUI(life=game, cell_size=32)
         gui.run()
