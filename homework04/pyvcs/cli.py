@@ -19,7 +19,7 @@ def cmd_hash_object(args: argparse.Namespace) -> None:
         data = f.read()
 
     sha = hash_object(data, args.type, args.write)
-    # print(sha)
+    print(sha)
 
 
 def cmd_cat_file(args: argparse.Namespace) -> None:
