@@ -9,7 +9,7 @@ def repo_find(workdir: tp.Union[str, pathlib.Path] = ".") -> pathlib.Path:
 
 
 def repo_create(workdir: tp.Union[str, pathlib.Path]) -> pathlib.Path:
-    path = pathlib.Path(".")
+    path = pathlib.Path(workdir)
     (path / ".git").mkdir(exist_ok=False, parents=True)
     (path / ".git" / "refs" / "heads").mkdir(exist_ok=True, parents=True)
     (path / ".git" / "refs" / "tags").mkdir(exist_ok=True, parents=True)
