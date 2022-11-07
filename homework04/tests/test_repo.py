@@ -42,22 +42,22 @@ class RepoCreateTestCase(TestCase):
                 "Unnamed pyvcs repository.\n", f.read(),
             )
 
-#     def test_cant_create_repo_if_workdir_is_a_file(self):
-#         filename = "test"
-#         workdir = pathlib.Path(filename)
-#         self.fs.create_file(workdir, contents="test")
-#         with self.assertRaises(Exception) as ctx:
-#             repo.repo_create(workdir)
-#         self.assertEqual(f"{filename} is not a directory", str(ctx.exception))
+    def test_cant_create_repo_if_workdir_is_a_file(self):
+        filename = "test"
+        workdir = pathlib.Path(filename)
+        self.fs.create_file(workdir, contents="test")
+        with self.assertRaises(Exception) as ctx:
+            repo.repo_create(workdir)
+        self.assertEqual(f"{filename} is not a directory", str(ctx.exception))
 
-#     def test_git_dir(self):
-#         dir_name = ".pyvcs"
-#         os.environ["GIT_DIR"] = dir_name
-#         workdir = pathlib.Path(".")
-#         actual_gitdir = repo.repo_create(workdir)
-#         expected_gitdir = workdir / dir_name
-#         self.assertEqual(expected_gitdir, actual_gitdir)
-#         self.assertTrue(expected_gitdir.exists())
+    def test_git_dir(self):
+        dir_name = ".pyvcs"
+        os.environ["GIT_DIR"] = dir_name
+        workdir = pathlib.Path(".")
+        actual_gitdir = repo.repo_create(workdir)
+        expected_gitdir = workdir / dir_name
+        self.assertEqual(expected_gitdir, actual_gitdir)
+        self.assertTrue(expected_gitdir.exists())
 
 
 # class RepoFindTestCase(TestCase):
