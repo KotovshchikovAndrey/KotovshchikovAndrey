@@ -4,8 +4,16 @@ import typing as tp
 
 
 def repo_find(workdir: tp.Union[str, pathlib.Path] = ".") -> pathlib.Path:
-    # PUT YOUR CODE HERE
-    ...
+    current_dir = pathlib.Path(workdir)
+    if (current_dir / os.environ["GIT_DIR"]).exists():
+        return pathlib.Path(workdir) / os.environ["GIT_DIR"]
+
+    for dir in current_dir.parents:
+        print(dir, dir.name)
+        if dir.name == os.environ["GIT_DIR"]:
+            return dir
+
+    raise Exception("Not a git repository")
 
 
 def repo_create(workdir: tp.Union[str, pathlib.Path]) -> pathlib.Path:

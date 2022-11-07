@@ -60,28 +60,29 @@ class RepoCreateTestCase(TestCase):
         self.assertTrue(expected_gitdir.exists())
 
 
-# class RepoFindTestCase(TestCase):
-#     def setUp(self):
-#         os.environ["GIT_DIR"] = ".git"
-#         self.setUpPyfakefs()
+class RepoFindTestCase(TestCase):
+    def setUp(self):
+        os.environ["GIT_DIR"] = ".git"
+        self.setUpPyfakefs()
 
-#     def test_repo_find(self):
-#         workdir = pathlib.Path(".")
-#         workdir = workdir.absolute()
-#         expected_gitdir = workdir / ".git"
-#         self.fs.create_dir(expected_gitdir)
-#         gitdir = repo.repo_find(workdir)
-#         self.assertEqual(expected_gitdir, gitdir)
+    def test_repo_find(self):
+        workdir = pathlib.Path(".")
+        workdir = workdir.absolute()
+        expected_gitdir = workdir / ".git"
+        self.fs.create_dir(expected_gitdir)
+        gitdir = repo.repo_find(workdir)
+        self.assertEqual(expected_gitdir, gitdir)
 
-#     def test_repo_find_in_a_given_dir(self):
-#         expected_gitdir = pathlib.Path("dir1") / ".git"
-#         expected_gitdir = expected_gitdir.absolute()
-#         current_dir = expected_gitdir / "dir2"
-#         self.fs.create_dir(current_dir)
-#         gitdir = repo.repo_find(current_dir)
-#         self.assertEqual(expected_gitdir, gitdir)
+    def test_repo_find_in_a_given_dir(self):
+        expected_gitdir = pathlib.Path("dir1") / ".git"
+        expected_gitdir = expected_gitdir.absolute()
+        current_dir = expected_gitdir / "dir2"
+        self.fs.create_dir(current_dir)
+        print(expected_gitdir, current_dir)
+        gitdir = repo.repo_find(current_dir)
+        self.assertEqual(expected_gitdir, gitdir)
 
-#     def test_repo_not_found(self):
-#         with self.assertRaises(Exception) as ctx:
-#             _ = repo.repo_find()
-#         self.assertEqual("Not a git repository", str(ctx.exception))
+    def test_repo_not_found(self):
+        with self.assertRaises(Exception) as ctx:
+            _ = repo.repo_find()
+        self.assertEqual("Not a git repository", str(ctx.exception))
