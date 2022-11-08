@@ -96,12 +96,14 @@ class ResolveObjectTestCase(TestCase):
         obj_name = "7e7"
         with self.assertRaises(Exception) as ctx:
             objects.resolve_object(obj_name, gitdir)
-        self.assertEqual(f"Not a valid object name {obj_name}", str(ctx.exception))
+        self.assertEqual(
+            f"Not a valid object name {obj_name}", str(ctx.exception))
 
         obj_name = "7e7774cf533c51803125d4659f3488bd9dffc41a1e"
         with self.assertRaises(Exception) as ctx:
             objects.resolve_object(obj_name, gitdir)
-        self.assertEqual(f"Not a valid object name {obj_name}", str(ctx.exception))
+        self.assertEqual(
+            f"Not a valid object name {obj_name}", str(ctx.exception))
 
     def test_resolve_object_that_does_not_exists(self):
         gitdir = repo.repo_create(".")
@@ -111,7 +113,8 @@ class ResolveObjectTestCase(TestCase):
         obj_name = "7e775"
         with self.assertRaises(Exception) as ctx:
             objects.resolve_object(obj_name, gitdir)
-        self.assertEqual(f"Not a valid object name {obj_name}", str(ctx.exception))
+        self.assertEqual(
+            f"Not a valid object name {obj_name}", str(ctx.exception))
 
 
 @unittest.skipIf(pyvcs.__version_info__ < (0, 3, 0), "Нужна версия пакета 0.3.0 и выше")
@@ -126,7 +129,8 @@ class ReadObjectTestCase(TestCase):
             b"x\x9cK\xca\xc9OR02`(\xc9H,Q/V(\x07R\n\xc5\x19\xa9\n\xc5\x89\x99)\x00\x83:\tb"
         )
         self.fs.create_file(file_path=blob_path, contents=blob_contents)
-        fmt, data = objects.read_object("7e774cf533c51803125d4659f3488bd9dffc41a6", gitdir)
+        fmt, data = objects.read_object(
+            "7e774cf533c51803125d4659f3488bd9dffc41a6", gitdir)
         self.assertEqual("blob", fmt)
         self.assertEqual(b"that's what she said", data)
 
@@ -145,7 +149,8 @@ class CatFileTestCase(TestCase):
         self.fs.create_file(file_path=blob_path, contents=blob_contents)
 
         with patch("sys.stdout", new=io.StringIO()) as out:
-            objects.cat_file("7e774cf533c51803125d4659f3488bd9dffc41a6", pretty=True)
+            objects.cat_file(
+                "7e774cf533c51803125d4659f3488bd9dffc41a6", pretty=True)
             self.assertEqual("that's what she said", out.getvalue().strip())
 
     @unittest.skipIf(pyvcs.__version_info__ < (0, 6, 0), "Нужна версия пакета 0.6.0 и выше")
@@ -153,7 +158,8 @@ class CatFileTestCase(TestCase):
         gitdir = repo.repo_create(".")
         mode100644 = stat.S_IFREG | stat.S_IRUSR | stat.S_IWUSR | stat.S_IRGRP | stat.S_IROTH
         quote = pathlib.Path("quote.txt")
-        self.fs.create_file(quote, contents="that's what she said", st_mode=mode100644)
+        self.fs.create_file(
+            quote, contents="that's what she said", st_mode=mode100644)
         letters = pathlib.Path("alphabeta") / "letters.txt"
         self.fs.create_file(letters, contents="abcdefg", st_mode=mode100644)
         digits = pathlib.Path("numbers") / "digits.txt"
