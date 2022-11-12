@@ -45,28 +45,37 @@ class GitIndexEntry(tp.NamedTuple):
         return struct.pack(
             PACK_FORMAT.format(name_length=len(self.name)), *list(attr_dict.values()))
 
-    @staticmethod
-    def unpack(data: bytes) -> "GitIndexEntry":
+    @classmethod
+    def unpack(cls, data: bytes) -> "GitIndexEntry":
         name_size = len(data) - DEFINITE_PACK_SIZE
         unpack_data = struct.unpack(
             UNPACK_FORMAT.format(name_length=name_size), data)
 
-        name_value: str = unpack_data[-1].decode().rstrip('\x00')
-        return GitIndexEntry(*unpack_data[:-1], name=name_value)
+        name_value: str = unpack_data[-1].decode().rstrip("\x00")
+        return cls(*unpack_data[:-1], name=name_value)
 
 
 def read_index(gitdir: pathlib.Path) -> tp.List[GitIndexEntry]:
-    # PUT YOUR CODE HERE
-    ...
+    index_path = gitdir / "index"
+    if not index_path.exists():
+        return []
+
+    index_data = index_path.read_bytes()
+    read_start, read_end = (
+        len(INDEX_START_BYTES) + 1,
+        len(index_data) - len(INDEX_END_BYTES)
+    )
+    pack_files_list = index_data[read_start:read_end].split(b"\x00\x00\x00^")
+
+    return [GitIndexEntry.unpack(b"^" + pack_data) for pack_data in pack_files_list]
 
 
 def write_index(gitdir: pathlib.Path, entries: tp.List[GitIndexEntry]) -> None:
-    index_path = gitdir / 'index'
-
     index_data_for_write = INDEX_START_BYTES
     for index_entry in entries:
         index_data_for_write += index_entry.pack()
 
+    index_path = gitdir / 'index'
     index_path.write_bytes(
         index_data_for_write + INDEX_END_BYTES)
 
@@ -77,28 +86,32 @@ def ls_files(gitdir: pathlib.Path, details: bool = False) -> None:
 
 
 def update_index(gitdir: pathlib.Path, paths: tp.List[pathlib.Path], write: bool = True) -> None:
-    files_for_index = [file for file in paths if file.exists()]
+    git_index_entry_list = []
 
-    index_path = gitdir / 'index'
-    stat_info = os.stat(paths)
-    for file in files_for_index:
+    for file in paths:
+        if not file.exists():
+            continue
+
         file_hash = hash_object(
-            data=file.read_bytes, fmt="blob", write=True)
+            data=file.read_bytes(), fmt="blob", write=True)
 
+        stat_info = os.stat(file)
         git_index_entry = GitIndexEntry(
-            ctime_n=int(stat_info.st_atime_ns),
             ctime_s=int(stat_info.st_ctime),
+            ctime_n=0,
             mtime_s=int(stat_info.st_mtime),
-            mtime_n=int(stat_info.st_mtime_ns),
+            mtime_n=0,
             dev=stat_info.st_dev,
             ino=stat_info.st_ino,
             mode=stat_info.st_mode,
             uid=stat_info.st_uid,
             gid=stat_info.st_gid,
             size=stat_info.st_size,
-            sha1=file_hash,
+            sha1=file_hash.encode(),
             flags=7,
             name=file.name
         )
 
-    index_path.write_bytes()
+        git_index_entry_list.append(git_index_entry)
+
+    write_index(gitdir, entries=git_index_entry_list)
