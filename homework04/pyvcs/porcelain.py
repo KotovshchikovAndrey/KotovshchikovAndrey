@@ -9,8 +9,7 @@ from pyvcs.tree import commit_tree, write_tree
 
 
 def add(gitdir: pathlib.Path, paths: tp.List[pathlib.Path]) -> None:
-    # PUT YOUR CODE HERE
-    ...
+    update_index(gitdir, paths)
 
 
 def commit(gitdir: pathlib.Path, message: str, author: tp.Optional[str] = None) -> str:

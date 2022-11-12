@@ -13,3 +13,5 @@ coverage.xml
 # Mypy cache
 .mypy_cache/
 
+andrey.py
+
