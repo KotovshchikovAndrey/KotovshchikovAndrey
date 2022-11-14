@@ -10,20 +10,19 @@ from pyvcs.refs import update_ref
 from pyvcs.repo import repo_find
 
 
-def _write_hash_in_repo(hash: str, store: str) -> None:
+def _write_hash_in_repo(hash: str, store: bytes) -> None:
     hash_title, hash_content = hash[:2], hash[2:]
 
     gitdir = repo_find()
     hash_path = gitdir / "objects" / hash_title
     hash_path.mkdir(exist_ok=True, parents=True)
     with open(hash_path / hash_content, 'wb') as hash_file:
-        hash_file.write(zlib.compress(store.encode()))
+        hash_file.write(zlib.compress(store))
 
 
 def hash_object(data: bytes, fmt: str, write: bool = False) -> str:
-    decoded_data = data.decode(encoding="UTF-8")
-    store = f"{fmt} {len(decoded_data)}\0" + decoded_data
-    hash = hashlib.sha1(store.encode()).hexdigest()
+    store = f"{fmt} {len(data)}\0".encode() + data
+    hash = hashlib.sha1(store).hexdigest()
     if write:
         _write_hash_in_repo(hash, store)
 

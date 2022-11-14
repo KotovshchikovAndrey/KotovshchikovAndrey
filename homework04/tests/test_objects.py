@@ -11,44 +11,44 @@ import pyvcs
 from pyvcs import index, objects, porcelain, repo, tree
 
 
-# @unittest.skipIf(pyvcs.__version_info__ < (0, 2, 0), "Нужна версия пакета 0.2.0 и выше")
-# class HashObjectTestCase(TestCase):
-#     def setUp(self):
-#         self.setUpPyfakefs()
+@unittest.skipIf(pyvcs.__version_info__ < (0, 2, 0), "Нужна версия пакета 0.2.0 и выше")
+class HashObjectTestCase(TestCase):
+    def setUp(self):
+        self.setUpPyfakefs()
 
-#     def test_compute_object_id(self):
-#         contents = "that's what she said"
-#         data = contents.encode()
-#         sha = objects.hash_object(data, fmt="blob")
-#         expected_sha = "7e774cf533c51803125d4659f3488bd9dffc41a6"
-#         self.assertEqual(expected_sha, sha)
+    def test_compute_object_id(self):
+        contents = "that's what she said"
+        data = contents.encode()
+        sha = objects.hash_object(data, fmt="blob")
+        expected_sha = "7e774cf533c51803125d4659f3488bd9dffc41a6"
+        self.assertEqual(expected_sha, sha)
 
-#     def test_compute_object_id_and_create_a_blob(self):
-#         gitdir = repo.repo_create(".")
+    def test_compute_object_id_and_create_a_blob(self):
+        gitdir = repo.repo_create(".")
 
-#         contents = "that's what she said"
-#         data = contents.encode()
-#         sha = objects.hash_object(data, fmt="blob", write=True)
-#         expected_sha = "7e774cf533c51803125d4659f3488bd9dffc41a6"
-#         self.assertEqual(expected_sha, sha)
+        contents = "that's what she said"
+        data = contents.encode()
+        sha = objects.hash_object(data, fmt="blob", write=True)
+        expected_sha = "7e774cf533c51803125d4659f3488bd9dffc41a6"
+        self.assertEqual(expected_sha, sha)
 
-#         obj_path = gitdir / "objects" / "7e" / "774cf533c51803125d4659f3488bd9dffc41a6"
-#         self.assertTrue(obj_path.exists())
+        obj_path = gitdir / "objects" / "7e" / "774cf533c51803125d4659f3488bd9dffc41a6"
+        self.assertTrue(obj_path.exists())
 
-#         with obj_path.open(mode="rb") as f:
-#             content = zlib.decompress(f.read())
-#         self.assertEqual(b"blob 20\x00that's what she said", content)
+        with obj_path.open(mode="rb") as f:
+            content = zlib.decompress(f.read())
+        self.assertEqual(b"blob 20\x00that's what she said", content)
 
-#     def test_hash_object_twice(self):
-#         _ = repo.repo_create(".")
+    def test_hash_object_twice(self):
+        _ = repo.repo_create(".")
 
-#         contents = "that's what she said"
-#         data = contents.encode()
-#         expected_sha = "7e774cf533c51803125d4659f3488bd9dffc41a6"
-#         sha = objects.hash_object(data, fmt="blob", write=True)
-#         self.assertEqual(expected_sha, sha)
-#         sha = objects.hash_object(data, fmt="blob", write=True)
-#         self.assertEqual(expected_sha, sha)
+        contents = "that's what she said"
+        data = contents.encode()
+        expected_sha = "7e774cf533c51803125d4659f3488bd9dffc41a6"
+        sha = objects.hash_object(data, fmt="blob", write=True)
+        self.assertEqual(expected_sha, sha)
+        sha = objects.hash_object(data, fmt="blob", write=True)
+        self.assertEqual(expected_sha, sha)
 
 
 # @unittest.skipIf(pyvcs.__version_info__ < (0, 3, 0), "Нужна версия пакета 0.3.0 и выше")
