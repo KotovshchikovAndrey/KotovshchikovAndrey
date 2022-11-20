@@ -27,11 +27,7 @@ def get_friends(
         'fields': fields
     }
 
-    response = requests.get(
-        url=f"{VK_CONFIG.get('domain')}/friends.get?access_token={VK_CONFIG.get('access_token', '')}",
-        params=query_params
-    )
-
+    response = session.get('friends.get', **query_params)
     if response.status_code == 200:
         response_data = response.json()['response']
         return FriendsResponse(**response_data)
