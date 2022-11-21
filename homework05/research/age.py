@@ -21,7 +21,7 @@ def _get_average_friends_age(date_list: tp.List[str]) -> tp.Optional[int]:
     return (age_sum / friends_count) if friends_count != 0 else None
      
 
-def age_predict(user_id: int) -> tp.Optional[float]:
+def age_predict(user_id: int) -> tp.Optional[int]:
     frields_list = get_friends(user_id, fields=['bdate'],)
     date_payload_list = [friend.get('bdate', None) for friend in frields_list.items]
     average_friends_age = _get_average_friends_age(date_payload_list)

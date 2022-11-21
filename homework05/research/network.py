@@ -12,8 +12,14 @@ from vkapi.friends import get_friends, get_mutual
 def ego_network(
     user_id: tp.Optional[int] = None, friends: tp.Optional[tp.List[int]] = None
 ) -> tp.List[tp.Tuple[int, int]]:
+    graph = []
     mutual_list = get_mutual(target_uids=friends)
-    print(mutual_list)
+    for item in mutual_list:
+        node = item["id"]
+        for friend_id in item["common_friends"]:
+            graph.append((node, friend_id))
+
+    return graph
 
 
 def plot_ego_network(net: tp.List[tp.Tuple[int, int]]) -> None:
@@ -30,7 +36,8 @@ def plot_communities(net: tp.List[tp.Tuple[int, int]]) -> None:
     graph.add_edges_from(net)
     layout = nx.spring_layout(graph)
     partition = community_louvain.best_partition(graph)
-    nx.draw(graph, layout, node_size=25, node_color=list(partition.values()), alpha=0.8)
+    nx.draw(graph, layout, node_size=25, node_color=list(
+        partition.values()), alpha=0.8)
     plt.title("Ego Network", size=15)
     plt.show()
 
@@ -58,6 +65,7 @@ def describe_communities(
         for uid in cluster_users:
             for friend in friends:
                 if uid == friend["id"]:
-                    data.append([cluster_n] + [friend.get(field) for field in fields])  # type: ignore
+                    data.append([cluster_n] + [friend.get(field)
+                                for field in fields])  # type: ignore
                     break
     return pd.DataFrame(data=data, columns=["cluster"] + fields)

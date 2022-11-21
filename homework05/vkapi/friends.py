@@ -8,8 +8,6 @@ from vkapi import config, session
 from vkapi.exceptions import APIError
 from vkapi.config import VK_CONFIG
 
-TARGET_LIMIT = 100
-
 QueryParams = tp.Optional[tp.Dict[str, tp.Union[str, int]]]
 
 
@@ -41,7 +39,10 @@ class MutualFriends(tp.TypedDict):
     common_count: int
 
 
-def _get_mutual_list_from_api(requests_count: int, **query_params):
+def _get_mutual_list_from_api(
+    requests_count: int = 1,
+    **query_params
+) -> tp.Union[tp.List[int], tp.List[dict]]:
     mutual_list = []
     for _ in range(requests_count):
         response = session.get('friends.getMutual', **query_params)
@@ -49,7 +50,7 @@ def _get_mutual_list_from_api(requests_count: int, **query_params):
             response_data = response.json()['response']
             mutual_list.extend(response_data)
 
-        query_params['offset'] += TARGET_LIMIT
+        query_params['offset'] += VK_CONFIG["target_limit"]
         time.sleep(3)
 
     return mutual_list
@@ -74,8 +75,10 @@ def get_mutual(
         'progress': progress
     }
 
-    requests_count = 1
-    if (target_uids is not None) and (len(target_uids) > TARGET_LIMIT):
-        requests_count = math.ceil(len(target_uids) / TARGET_LIMIT)
+    if (target_uids is not None):
+        requests_count = math.ceil(
+            len(target_uids) / VK_CONFIG["target_limit"])
+        mutual_list = _get_mutual_list_from_api(requests_count, **query_params)
+        return [MutualFriends(**item) for item in mutual_list]
 
-    return _get_mutual_list_from_api(requests_count, **query_params)
+    return _get_mutual_list_from_api(**query_params)
