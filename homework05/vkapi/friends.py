@@ -8,6 +8,8 @@ from vkapi import config, session
 from vkapi.exceptions import APIError
 from vkapi.config import VK_CONFIG
 
+TARGET_LIMIT = 100
+
 QueryParams = tp.Optional[tp.Dict[str, tp.Union[str, int]]]
 
 
@@ -39,6 +41,20 @@ class MutualFriends(tp.TypedDict):
     common_count: int
 
 
+def _get_mutual_list_from_api(requests_count: int, **query_params):
+    mutual_list = []
+    for _ in range(requests_count):
+        response = session.get('friends.getMutual', **query_params)
+        if response.status_code == 200:
+            response_data = response.json()['response']
+            mutual_list.extend(response_data)
+
+        query_params['offset'] += TARGET_LIMIT
+        time.sleep(3)
+
+    return mutual_list
+
+
 def get_mutual(
     source_uid: tp.Optional[int] = None,
     target_uid: tp.Optional[int] = None,
@@ -48,15 +64,18 @@ def get_mutual(
     offset: int = 0,
     progress=None,
 ) -> tp.Union[tp.List[int], tp.List[MutualFriends]]:
-    """
-    Получить список идентификаторов общих друзей между парой пользователей.
+    query_params = {
+        'source_uid': source_uid,
+        'target_uid': target_uid,
+        'target_uids': target_uids,
+        'order': order,
+        'count': count,
+        'offset': offset,
+        'progress': progress
+    }
 
-    :param source_uid: Идентификатор пользователя, чьи друзья пересекаются с друзьями пользователя с идентификатором target_uid.
-    :param target_uid: Идентификатор пользователя, с которым необходимо искать общих друзей.
-    :param target_uids: Cписок идентификаторов пользователей, с которыми необходимо искать общих друзей.
-    :param order: Порядок, в котором нужно вернуть список общих друзей.
-    :param count: Количество общих друзей, которое нужно вернуть.
-    :param offset: Смещение, необходимое для выборки определенного подмножества общих друзей.
-    :param progress: Callback для отображения прогресса.
-    """
-    pass
+    requests_count = 1
+    if (target_uids is not None) and (len(target_uids) > TARGET_LIMIT):
+        requests_count = math.ceil(len(target_uids) / TARGET_LIMIT)
+
+    return _get_mutual_list_from_api(requests_count, **query_params)
