@@ -43,7 +43,7 @@ class GetWallTestCase(unittest.TestCase):
             wall.to_dict("records"),
             msg="Вы должны сделать один запрос, чтобы узнать общее число записей",
         )
-        resp_body = unquote(responses.calls[0].request.body)
+        resp_body = unquote(responses.calls[0].request.body).replace("'", '"')
         self.assertTrue(
             '"count":"1"' in resp_body or '"count":+"1"' in resp_body,
             msg="Вы должны сделать один запрос, чтобы узнать общее число записей",

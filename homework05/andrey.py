@@ -25,9 +25,9 @@ code = """
 
 def get_posts_2500(
     query_params: tp.Dict[str, tp.Any],
-    count: int = 2500
+    count: int = 1000
 ) -> tp.List[tp.Dict[str, tp.Any]]:
-    query_params["count"] = str(count)
+    query_params["count"] = count
     code_data = code % query_params
     request_data = {
         "access_token": config.VK_CONFIG["access_token"],
@@ -39,7 +39,10 @@ def get_posts_2500(
         "execute", **request_data)
 
     if response.status_code == 200:
-        response_data = response.json()["response"]["items"]
+        response_data = []
+        for posts in response.json()["response"]:
+            response_data += posts
+
         return response_data
 
 
@@ -48,7 +51,7 @@ def get_wall_execute(
     domain: str = "",
     offset: int = 0,
     count: int = 10,
-    max_count: int = 2500,
+    max_count: int = 1000,
     filter: str = "owner",
     extended: int = 0,
     fields: tp.Optional[tp.List[str]] = None,
@@ -67,21 +70,15 @@ def get_wall_execute(
     wall_execute_data = []
     iter_count = math.ceil(count / max_count)
     i = 0
-    start = time.time()
     while (i < iter_count) and (count > 0):
         if count >= max_count:
             posts_list = get_posts_2500(query_params)
             wall_execute_data += posts_list
-            count -= 2500
-            query_params["offset"] += 2500
+            count -= 1000
+            query_params["offset"] += 1000
         else:
             posts_list = get_posts_2500(query_params, count)
             wall_execute_data += posts_list
             break
-
-        request_delta_time = time.time() - start
-        if request_delta_time < 1:
-            time.sleep(1 - request_delta_time)
-            start = time.time()
 
     return pd.json_normalize(wall_execute_data)
