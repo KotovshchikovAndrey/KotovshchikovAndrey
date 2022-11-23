@@ -17,30 +17,31 @@ code = """
         items.push(responseItems);
         i = i + 1;
         query_params.count = query_params.count - 100;
-        query_params.offset = query_params.offset + 100;
+        query_params.offset = query_params.offset + responseItems.length;
     }
     return items;
 """
 
 
 def get_posts_2500(
-    query_params: tp.Dict[str, tp.Any],
-    count: int = 2500
+    count: int = 2500,
+    **kwargs: str
 ) -> tp.List[tp.Dict[str, tp.Any]]:
-    query_params["count"] = str(count)
-    code_data = code % query_params
+    kwargs["count"] = str(count)
+    code_data = code % kwargs
     request_data = {
         "access_token": config.VK_CONFIG["access_token"],
         "v": config.VK_CONFIG["version"],
         "code": code_data,
     }
 
-    response = session.post(
-        "execute", **request_data)
-
-    if response.status_code == 200:
+    response = session.post("execute", **request_data)
+    try:
         response_data = response.json()["response"]["items"]
-        return response_data
+    except Exception as e:
+        raise APIError.bad_request(message=str(e))
+
+    return response_data
 
 
 def get_wall_execute(
@@ -70,18 +71,18 @@ def get_wall_execute(
     start = time.time()
     while (i < iter_count) and (count > 0):
         if count >= max_count:
-            posts_list = get_posts_2500(query_params)
+            posts_list = get_posts_2500(**query_params)
             wall_execute_data += posts_list
             count -= 2500
             query_params["offset"] += 2500
         else:
-            posts_list = get_posts_2500(query_params, count)
+            posts_list = get_posts_2500(count, **query_params)
             wall_execute_data += posts_list
             break
 
-        request_delta_time = time.time() - start
-        if request_delta_time < 1:
-            time.sleep(1 - request_delta_time)
+        requests_delta_time = time.time() - start
+        if requests_delta_time < 1:
+            time.sleep(1 - requests_delta_time)
             start = time.time()
 
     return pd.json_normalize(wall_execute_data)

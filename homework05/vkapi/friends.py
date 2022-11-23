@@ -27,9 +27,11 @@ def get_friends(
     }
 
     response = session.get('friends.get', **query_params)
-    if response.status_code == 200:
+    try:
         response_data = response.json()['response']
         return FriendsResponse(**response_data)
+    except Exception as e:
+        raise APIError.bad_request(message=str(e))
 
 
 class MutualFriends(tp.TypedDict):
@@ -45,12 +47,6 @@ def _get_mutual_list_from_api(
     mutual_list = []
     requests_send_count, start = 0, time.time()
     for _ in range(requests_count):
-        requests_delta_time = time.time() - start
-        if requests_delta_time < 1 and requests_send_count >= 3:
-            time.sleep(1 - requests_delta_time)
-            start = time.time()
-            requests_send_count = 0
-
         response = session.get('friends.getMutual', **query_params)
         if response.status_code == 200:
             response_data = response.json()['response']
@@ -58,6 +54,12 @@ def _get_mutual_list_from_api(
 
         query_params['offset'] += VK_CONFIG["target_limit"]
         requests_send_count += 1
+
+        requests_delta_time = time.time() - start
+        if requests_delta_time < 1 and requests_send_count >= 3:
+            time.sleep(1 - requests_delta_time)
+            start = time.time()
+            requests_send_count = 0
 
     return mutual_list
 

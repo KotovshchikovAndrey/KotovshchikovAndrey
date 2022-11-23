@@ -17,68 +17,92 @@ code = """
         items.push(responseItems);
         i = i + 1;
         query_params.count = query_params.count - 100;
-        query_params.offset = query_params.offset + 100;
+        query_params.offset = query_params.offset + responseItems.length;
     }
     return items;
 """
 
 
-def get_posts_2500(
-    query_params: tp.Dict[str, tp.Any],
-    count: int = 1000
-) -> tp.List[tp.Dict[str, tp.Any]]:
-    query_params["count"] = count
-    code_data = code % query_params
-    request_data = {
-        "access_token": config.VK_CONFIG["access_token"],
-        "v": config.VK_CONFIG["version"],
-        "code": code_data,
-    }
+class PostVkAdapter:
+    _query_params: tp.Dict[str, tp.Any]
+    _total_requests_count_in_second: int
 
-    response = session.post(
-        "execute", **request_data)
+    def __init__(
+        self,
+        total_requests_count_in_second: int,
+        **kwargs: str
+    ) -> None:
+        self._total_requests_count_in_second = total_requests_count_in_second
+        self._query_params = kwargs
 
-    if response.status_code == 200:
-        response_data = []
-        for posts in response.json()["response"]:
-            response_data += posts
+    def get_posts_execute(
+        self,
+        count: int,
+        max_count: int
+    ) -> tp.List[tp.Dict[str, tp.Any]]:
+        offset = self._query_params.get("offset", 0)
+        posts_execute_data = []
+        iter_count = math.ceil(count / max_count)
+        start = time.time()
+        i, send_request_count = 0, 0
+        while (i < iter_count) and (count > 0):
+            if count >= max_count:
+                posts_list = self._get_posts_from_api()
+                posts_execute_data += posts_list
+                count -= 1000
+                offset += 1000
+            else:
+                posts_list = self._get_posts_from_api(count)
+                posts_execute_data += posts_list
+                break
 
-        return response_data
+            send_request_count += 1
+            request_delta_time = time.time() - start
+            if (request_delta_time < 1) and (
+                send_request_count >= self._total_requests_count_in_second
+            ):
+                time.sleep(1 - request_delta_time)
+                start, send_request_count = time.time(), 0
+
+        return posts_execute_data
+
+    def _get_posts_from_api(
+        self,
+        count: int = 1000
+    ) -> tp.List[tp.Dict[str, tp.Any]]:
+        self._query_params["count"] = count
+        code_data = code % self._query_params
+        request_data = {
+            "access_token": config.VK_CONFIG["access_token"],
+            "v": config.VK_CONFIG["version"],
+            "code": code_data,
+        }
+
+        response = session.post("execute", **request_data)
+        try:
+            response_data = response.json()["response"]
+        except Exception as e:
+            raise APIError.bad_request(message=str(e))
+
+        posts_execute_list = []
+        for posts in response_data:
+            posts_execute_list += posts
+
+        return posts_execute_list
 
 
-def get_wall_execute(
-    owner_id: str = "",
-    domain: str = "",
-    offset: int = 0,
-    count: int = 10,
-    max_count: int = 1000,
-    filter: str = "owner",
-    extended: int = 0,
-    fields: tp.Optional[tp.List[str]] = None,
-    progress=None,
-) -> pd.DataFrame:
-    query_params = {
-        "owner_id": owner_id,
-        "domain": domain,
-        "offset": offset,
-        "filter": filter,
-        "extended": extended,
-        "fields": fields,
-        "v": "5.126"
-    }
+p = {
+    "owner_id": "",
+    "domain": "itmoru",
+    "offset": 150,
+    "filter": "owner",
+    "extended": 0,
+    "fields": "",
+}
 
-    wall_execute_data = []
-    iter_count = math.ceil(count / max_count)
-    i = 0
-    while (i < iter_count) and (count > 0):
-        if count >= max_count:
-            posts_list = get_posts_2500(query_params)
-            wall_execute_data += posts_list
-            count -= 1000
-            query_params["offset"] += 1000
-        else:
-            posts_list = get_posts_2500(query_params, count)
-            wall_execute_data += posts_list
-            break
-
-    return pd.json_normalize(wall_execute_data)
+post_adapter = PostVkAdapter(
+    total_requests_count_in_second=3,
+    **p
+)
+r = post_adapter.get_posts_execute(count=7500, max_count=1000)
+print(len(r))
