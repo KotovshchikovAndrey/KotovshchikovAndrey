@@ -1,6 +1,6 @@
+import math
 import time
 import typing as tp
-import math
 
 import pandas as pd
 
@@ -27,18 +27,12 @@ class PostVkAdapter:
     _query_params: tp.Dict[str, tp.Any]
     _total_requests_count_in_second: int
 
-    def __init__(
-        self,
-        total_requests_count_in_second: int,
-        **kwargs: str
-    ) -> None:
+    def __init__(self, total_requests_count_in_second: int, **kwargs: str) -> None:
         self._total_requests_count_in_second = total_requests_count_in_second
         self._query_params = kwargs
 
     def get_posts_execute(
-        self,
-        count: int,
-        max_count: int
+        self, count: int, max_count: int
     ) -> tp.List[tp.Dict[str, tp.Any]]:
         offset = self._query_params.get("offset", 0)
         posts_execute_data = []
@@ -66,10 +60,7 @@ class PostVkAdapter:
 
         return posts_execute_data
 
-    def _get_posts_from_api(
-        self,
-        count: int = 1000
-    ) -> tp.List[tp.Dict[str, tp.Any]]:
+    def _get_posts_from_api(self, count: int = 1000) -> tp.List[tp.Dict[str, tp.Any]]:
         self._query_params["count"] = count
         code_data = code % self._query_params
         request_data = {
@@ -100,9 +91,6 @@ p = {
     "fields": "",
 }
 
-post_adapter = PostVkAdapter(
-    total_requests_count_in_second=3,
-    **p
-)
+post_adapter = PostVkAdapter(total_requests_count_in_second=3, **p)
 r = post_adapter.get_posts_execute(count=7500, max_count=1000)
 print(len(r))

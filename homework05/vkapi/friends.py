@@ -4,8 +4,8 @@ import time
 import typing as tp
 
 from vkapi import session
-from vkapi.exceptions import APIError
 from vkapi.config import VK_CONFIG
+from vkapi.exceptions import APIError
 
 QueryParams = tp.Optional[tp.Dict[str, tp.Union[str, int]]]
 
@@ -17,18 +17,21 @@ class FriendsResponse:
 
 
 def get_friends(
-    user_id: int, count: int = 5000, offset: int = 0, fields: tp.Optional[tp.List[str]] = None
+    user_id: int,
+    count: int = 5000,
+    offset: int = 0,
+    fields: tp.Optional[tp.List[str]] = None,
 ) -> FriendsResponse:
     query_params = {
-        'user_id': user_id,
-        'count': count,
-        'offset': offset,
-        'fields': fields
+        "user_id": user_id,
+        "count": count,
+        "offset": offset,
+        "fields": fields,
     }
 
-    response = session.get('friends.get', **query_params)
+    response = session.get("friends.get", **query_params)
     try:
-        response_data = response.json()['response']
+        response_data = response.json()["response"]
         return FriendsResponse(**response_data)
     except Exception as e:
         raise APIError.bad_request(message=str(e))
@@ -41,18 +44,17 @@ class MutualFriends(tp.TypedDict):
 
 
 def _get_mutual_list_from_api(
-    requests_count: int = 1,
-    **query_params
+    requests_count: int = 1, **query_params
 ) -> tp.Union[tp.List[int], tp.List[tp.Dict[str, tp.Any]]]:
     mutual_list = []
     requests_send_count, start = 0, time.time()
     for _ in range(requests_count):
-        response = session.get('friends.getMutual', **query_params)
+        response = session.get("friends.getMutual", **query_params)
         if response.status_code == 200:
-            response_data = response.json()['response']
+            response_data = response.json()["response"]
             mutual_list.extend(response_data)
 
-        query_params['offset'] += VK_CONFIG["target_limit"]
+        query_params["offset"] += VK_CONFIG["target_limit"]
         requests_send_count += 1
 
         requests_delta_time = time.time() - start
@@ -74,24 +76,25 @@ def get_mutual(
     progress=None,
 ) -> tp.Union[tp.List[int], tp.List[MutualFriends]]:
     query_params = {
-        'source_uid': source_uid,
-        'target_uid': target_uid,
-        'target_uids': target_uids,
-        'order': order,
-        'count': count,
-        'offset': offset,
-        'progress': progress
+        "source_uid": source_uid,
+        "target_uid": target_uid,
+        "target_uids": target_uids,
+        "order": order,
+        "count": count,
+        "offset": offset,
+        "progress": progress,
     }
 
     requests_count = 1
-    if (target_uids is not None):
-        requests_count = math.ceil(
-            len(target_uids) / VK_CONFIG["target_limit"])
+    if target_uids is not None:
+        target_limit = VK_CONFIG["target_limit"]
+        assert isinstance(target_limit, int)
+        requests_count = math.ceil(len(target_uids) / target_limit)
 
     mutual_list = _get_mutual_list_from_api(requests_count, **query_params)
     try:
-        mutual_friends_list = [MutualFriends(**item) for item in mutual_list]
+        mutual_friends_list = [MutualFriends(**item) for item in mutual_list]  # type: ignore
     except TypeError:
-        return mutual_list
+        return mutual_list  # type: ignore
 
     return mutual_friends_list

@@ -1,10 +1,10 @@
 import typing as tp
 from collections import defaultdict
 
-import community as community_louvain
-import matplotlib.pyplot as plt
-import networkx as nx
-import pandas as pd
+import community as community_louvain  # type: ignore
+import matplotlib.pyplot as plt  # type: ignore
+import networkx as nx  # type: ignore
+import pandas as pd  # type: ignore
 
 from vkapi.friends import get_friends, get_mutual
 
@@ -15,6 +15,7 @@ def ego_network(
     graph = []
     mutual_list = get_mutual(target_uids=friends)
     for item in mutual_list:
+        assert isinstance(item, dict)
         node = item["id"]
         for friend_id in item["common_friends"]:
             graph.append((node, friend_id))
@@ -36,8 +37,7 @@ def plot_communities(net: tp.List[tp.Tuple[int, int]]) -> None:
     graph.add_edges_from(net)
     layout = nx.spring_layout(graph)
     partition = community_louvain.best_partition(graph)
-    nx.draw(graph, layout, node_size=25, node_color=list(
-        partition.values()), alpha=0.8)
+    nx.draw(graph, layout, node_size=25, node_color=list(partition.values()), alpha=0.8)
     plt.title("Ego Network", size=15)
     plt.show()
 
@@ -65,7 +65,8 @@ def describe_communities(
         for uid in cluster_users:
             for friend in friends:
                 if uid == friend["id"]:
-                    data.append([cluster_n] + [friend.get(field)
-                                for field in fields])  # type: ignore
+                    data.append(
+                        [cluster_n] + [friend.get(field) for field in fields]
+                    )  # type: ignore
                     break
     return pd.DataFrame(data=data, columns=["cluster"] + fields)

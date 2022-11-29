@@ -1,8 +1,8 @@
+import math
 import time
 import typing as tp
-import math
 
-import pandas as pd
+import pandas as pd  # type: ignore
 
 from vkapi import config, session
 from vkapi.exceptions import APIError
@@ -24,8 +24,7 @@ code = """
 
 
 def get_posts_2500(
-    count: int = 2500,
-    **kwargs: str
+    count: int = 2500, **kwargs: tp.Any
 ) -> tp.List[tp.Dict[str, tp.Any]]:
     kwargs["count"] = str(count)
     code_data = code % kwargs
@@ -62,7 +61,7 @@ def get_wall_execute(
         "filter": filter,
         "extended": extended,
         "fields": fields,
-        "v": "5.126"
+        "v": "5.126",
     }
 
     wall_execute_data = []
@@ -71,12 +70,12 @@ def get_wall_execute(
     start = time.time()
     while (i < iter_count) and (count > 0):
         if count >= max_count:
-            posts_list = get_posts_2500(**query_params)
+            posts_list = get_posts_2500(count=2500, **query_params)
             wall_execute_data += posts_list
             count -= 2500
-            query_params["offset"] += 2500
+            query_params["offset"] += 2500  # type: ignore
         else:
-            posts_list = get_posts_2500(count, **query_params)
+            posts_list = get_posts_2500(count=count, kwargs=query_params)
             wall_execute_data += posts_list
             break
 
