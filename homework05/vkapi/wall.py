@@ -22,9 +22,7 @@ code = """
 """
 
 
-def get_posts_2500(
-    count: int = 2500, **kwargs: tp.Any
-) -> tp.List[tp.Dict[str, tp.Any]]:
+def get_posts_2500(count: int = 2500, **kwargs: tp.Any) -> tp.List[tp.Dict[str, tp.Any]]:
     kwargs["count"] = str(count)
     code_data = code % kwargs
     request_data = {

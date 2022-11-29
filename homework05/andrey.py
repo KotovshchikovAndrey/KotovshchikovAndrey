@@ -30,9 +30,7 @@ class PostVkAdapter:
         self._total_requests_count_in_second = total_requests_count_in_second
         self._query_params = kwargs
 
-    def get_posts_execute(
-        self, count: int, max_count: int
-    ) -> tp.List[tp.Dict[str, tp.Any]]:
+    def get_posts_execute(self, count: int, max_count: int) -> tp.List[tp.Dict[str, tp.Any]]:
         offset = self._query_params.get("offset", 0)
         posts_execute_data = []
         iter_count = math.ceil(count / max_count)
