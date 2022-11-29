@@ -5,7 +5,6 @@ from urllib.parse import unquote
 
 import pandas as pd  # type: ignore
 import responses
-
 from vkapi.wall import get_wall_execute
 
 

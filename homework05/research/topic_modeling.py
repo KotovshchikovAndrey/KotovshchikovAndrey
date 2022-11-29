@@ -3,7 +3,6 @@ import pyLDAvis.gensim_models  # type: ignore
 from gensim.corpora import Dictionary  # type: ignore
 from textacy import preprocessing  # type: ignore
 from tqdm import tqdm
-
 from vkapi.wall import get_wall_execute
 
 

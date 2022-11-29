@@ -4,7 +4,6 @@ import unittest
 import httpretty  # type: ignore
 import responses
 from requests.exceptions import ConnectionError, HTTPError, ReadTimeout, RetryError
-
 from vkapi.session import Session
 
 

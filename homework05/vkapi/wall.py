@@ -3,7 +3,6 @@ import time
 import typing as tp
 
 import pandas as pd  # type: ignore
-
 from vkapi import config, session
 from vkapi.exceptions import APIError
 
